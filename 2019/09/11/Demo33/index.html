@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Servlet入门与Tomcat基本配置, 小鱼儿的技术博客">
+    <meta name="keywords" content="Servlet与request入门（一), 小鱼儿的技术博客">
     <meta name="description" content="Servlet
 概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，定义了Java类被浏览器访问到(tomcat识别)的规则 
 将来我们自定义一个类，实现复写Servlet接口，复写方法.  快速入门：
@@ -16,7 +16,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Servlet入门与Tomcat基本配置 | 小鱼儿的技术博客</title>
+    <title>Servlet与request入门（一) | 小鱼儿的技术博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -282,13 +282,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Servlet入门与Tomcat基本配置
+                        Servlet与request入门（一)
                     </div>
                 </div>
             </div>
@@ -399,8 +399,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/servler/" target="_blank">
-                                <span class="chip bg-color">servler</span>
+                            <a href="/tags/servlet/" target="_blank">
+                                <span class="chip bg-color">servlet</span>
                             </a>
                         
                     </div>
@@ -446,7 +446,7 @@
                 <h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><ul>
 <li>概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，定义了Java类被浏览器访问到(tomcat识别)的规则 </li>
 <li>将来我们自定义一个类，实现复写Servlet接口，复写方法.  <h4 id="快速入门："><a href="#快速入门：" class="headerlink" title="快速入门："></a>快速入门：</h4></li>
-<li>1.创建JavaEE的项目<br><img src="https://wx3.sinaimg.cn/large/006VKolAly1g6eefc9a4pj30c40dtq36.jpg" alt="cf5ba6a73b2c9f25369c7670a4611e6"></li>
+<li>1.创建JavaEE的项目  <img src="/2019/09/11/Demo33/01.jpg"></li>
 <li>2.定义一个类，实现Servlet接口，实现接口中的抽象方法<br><code>public class ServletDemo01 implements Servlet</code></li>
 <li>3.配置Servlet，在web.xml中配置 <pre><code>&lt;!--配置Servlet --&gt;
   &lt;servlet&gt;
@@ -487,7 +487,7 @@
 <strong>Servlet的init方法只执行一次，说明了一个Servlet在内存中只存在一个对象，Servlet是单例的,所以，多个用户访问时，可能存在线程安全问题</strong><br><del>尝试加锁，但是不行，影响了性能</del>,<strong><em>解决办法：尽量不要在Servlet中定义成员变量，即使定义了成员变量，也不要对其修改值，避免并发的操作</em></strong></li>
 <li>提供服务:执行service方法，执行多次<br>每次访问Servlet时，Service方法都会被调用一次</li>
 <li>被销毁：执行destory方法，只执行一次<br>Servlet被销毁时执行，即服务器正常关闭时，<strong>注意：destory方法在Servlet被销毁之前执行，一般用于释放资源</strong>  <h4 id="解决Servlet配置问题"><a href="#解决Servlet配置问题" class="headerlink" title="解决Servlet配置问题"></a>解决Servlet配置问题</h4></li>
-<li>Servlet3.0之后，支持注解配置，可以不需要web.xml<br><img src="https://ws4.sinaimg.cn/large/006VKolAly1g6eehsd44wj307s04it8i.jpg" alt="81a774e2229978ac5be5cbd0f4967b6"></li>
+<li>Servlet3.0之后，支持注解配置，可以不需要web.xml  <img src="/2019/09/11/Demo33/02.jpg"></li>
 <li>步骤：  </li>
 </ul>
 <p>1.创建JavaEE的项目,选择Servlet的版本，3.0以上，可以不创建web.xml<br>2.定义一个类，实现Servlet接口<br>3.复写方法<br><strong>4.在类上使用@WebServlet注解，进行配置</strong><br><code>@WebServlet(urlPatterns = &quot;/资源路径&quot;)</code>  </p>
@@ -496,7 +496,16 @@
 <li>2.工作空间目录和Tomcat部署的web项目  <ul>
 <li><strong>Tomcat真正访问的是“Tomcat部署的web项目，以我电脑为例 D:\IntelliJIDEA2018\Test\out\artifacts\TestDemo02_war_exploded”，Tomcat部署的web项目对应着工作空间项目的web目录下的所有资源，而且web-INFO下的classes对应的字节码文件是工作空间src下的Java文件被编译后放到里面的</strong>  </li>
 <li><strong><em>WEB_INFO目录下的资源不能被浏览器直接访问，所以一般不把一些静态资源放到这下面</em></strong>  </li>
-<li>在Tomcat如何断点调试<br>使用“小虫子”启动<br><img src="https://wx3.sinaimg.cn/large/006VKolAly1g6eisf84htj307j02tjr6.jpg" alt="315772ceda1476ff9a038df9da49207">  </li>
+<li>在Tomcat如何断点调试<br>使用“小虫子”启动  <img src="/2019/09/11/Demo33/03.jpg">
+
+
+
+
+
+
+
+
+</li>
 </ul>
 </li>
 </ul>
@@ -659,9 +668,9 @@
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《Servlet入门与Tomcat基本配置》
+                    《Servlet与request入门（一)》
                 </span> 由
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/11/Demo3/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/11/Demo33/" property="cc:attributionName"
                rel="cc:attributionURL">
                 小鱼儿
             </a> 采用
@@ -706,13 +715,13 @@
                 <i class="fa fa-dot-circle-o"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/2019/09/11/Demo3/">
+                <a href="/2019/09/11/Demo33/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="Servlet入门与Tomcat基本配置">
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Servlet与request入门（一)">
                         
-                        <span class="card-title">Servlet入门与Tomcat基本配置</span>
+                        <span class="card-title">Servlet与request入门（一)</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -748,8 +757,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/servler/" target="_blank">
-                        <span class="chip bg-color">servler</span>
+                    <a href="/tags/servlet/" target="_blank">
+                        <span class="chip bg-color">servlet</span>
                     </a>
                     
                 </div>
