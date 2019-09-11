@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://Yogaguo.github.io/"/>
-  <updated>2019-09-11T09:23:16.217Z</updated>
+  <updated>2019-09-11T09:12:07.893Z</updated>
   <id>https://Yogaguo.github.io/</id>
   
   <author>
@@ -15,33 +15,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Servlet入门与Tomcat相关配置</title>
-    <link href="https://Yogaguo.github.io/2019/09/11/Demo3/"/>
-    <id>https://Yogaguo.github.io/2019/09/11/Demo3/</id>
-    <published>2019-09-11T09:21:21.000Z</published>
-    <updated>2019-09-11T09:23:16.217Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><ul><li>概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，定义了Java类被浏览器访问到(tomcat识别)的规则 </li><li>将来我们自定义一个类，实现复写Servlet接口，复写方法.  <h4 id="快速入门："><a href="#快速入门：" class="headerlink" title="快速入门："></a>快速入门：</h4></li><li>1.创建JavaEE的项目<br><img src="https://wx3.sinaimg.cn/large/006VKolAly1g6eefc9a4pj30c40dtq36.jpg" alt="cf5ba6a73b2c9f25369c7670a4611e6"></li><li>2.定义一个类，实现Servlet接口，实现接口中的抽象方法<br><code>public class ServletDemo01 implements Servlet</code></li><li>3.配置Servlet，在web.xml中配置 <pre><code>&lt;!--配置Servlet --&gt;  &lt;servlet&gt;      &lt;servlet-name&gt;demo01&lt;/servlet-name&gt;      &lt;servlet-class&gt;cn.yogaguo.web.servlet.ServletDemo01&lt;/servlet-class&gt;  &lt;/servlet&gt;  &lt;servlet-mapping&gt;      &lt;servlet-name&gt;demo01&lt;/servlet-name&gt;      &lt;url-pattern&gt;/demo01&lt;/url-pattern&gt;  &lt;/servlet-mapping&gt;&lt;/web-app&gt;  </code></pre><ul><li>4.执行原理:  <ul><li>当服务端接收到客户端浏览器的请求后，会解析请求URL路径，获取访问的Servlet的资源路径  </li><li>查找web.xml文件，是否有对应的<url-pattern>标签体内容。如果有，则在找到对应的<servlet-class>全类名  </servlet-class></url-pattern></li><li>tomcat会将字节码文件加载到内存，并且创建其对象  </li><li>调用其方法  <h4 id="Servlet中的生命周期"><a href="#Servlet中的生命周期" class="headerlink" title="Servlet中的生命周期:"></a>Servlet中的生命周期:</h4></li></ul></li></ul></li><li>被创建:执行init方法,只执行一次  <ul><li>Servlet什么时候被创建  <ul><li>默认情况下，第一次被访问，Servlet被创建  </li><li>当然，可以配置Servlet的创建时机    </li></ul>  <strong>在<servlet>标签下配置</servlet></strong>  <pre><code>&lt;servlet&gt;    &lt;servlet-name&gt;demo02&lt;/servlet-name&gt;    &lt;servlet-class&gt;cn.yogaguo.web.servlet.ServletDemo02&lt;/servlet-class&gt;    &lt;!--指定Servlet的创建时机           1.第一次被访问时，创建                * &lt;load-on-startup&gt;的值为负数，对应1情况（默认值为-1）           2.在服务器启动时，创建                * &lt;load-on-startup&gt;的值为0或正整数           --&gt;    &lt;load-on-startup&gt;5&lt;/load-on-startup&gt;&lt;/servlet&gt;  </code></pre></li></ul><strong>Servlet的init方法只执行一次，说明了一个Servlet在内存中只存在一个对象，Servlet是单例的,所以，多个用户访问时，可能存在线程安全问题</strong><br><del>尝试加锁，但是不行，影响了性能</del>,<strong><em>解决办法：尽量不要在Servlet中定义成员变量，即使定义了成员变量，也不要对其修改值，避免并发的操作</em></strong></li><li>提供服务:执行service方法，执行多次<br>每次访问Servlet时，Service方法都会被调用一次</li><li>被销毁：执行destory方法，只执行一次<br>Servlet被销毁时执行，即服务器正常关闭时，<strong>注意：destory方法在Servlet被销毁之前执行，一般用于释放资源</strong>  <h4 id="解决Servlet配置问题"><a href="#解决Servlet配置问题" class="headerlink" title="解决Servlet配置问题"></a>解决Servlet配置问题</h4></li><li>Servlet3.0之后，支持注解配置，可以不需要web.xml<br><img src="https://ws4.sinaimg.cn/large/006VKolAly1g6eehsd44wj307s04it8i.jpg" alt="81a774e2229978ac5be5cbd0f4967b6"></li><li>步骤：  </li></ul><p>1.创建JavaEE的项目,选择Servlet的版本，3.0以上，可以不创建web.xml<br>2.定义一个类，实现Servlet接口<br>3.复写方法<br><strong>4.在类上使用@WebServlet注解，进行配置</strong><br><code>@WebServlet(urlPatterns = &quot;/资源路径&quot;)</code>  </p><h4 id="IDEA与Tamcat的相关配置"><a href="#IDEA与Tamcat的相关配置" class="headerlink" title="IDEA与Tamcat的相关配置"></a>IDEA与Tamcat的相关配置</h4><ul><li>1.IDEA会为每一个tomcat部署的项目单独建立一份配置文件<br>查看控制台的输出log:Using CATALINA_BASE:   “C:\Users\LENOVO.IntelliJIdea2018.2\system\tomcat_Test”  </li><li>2.工作空间目录和Tomcat部署的web项目  <ul><li><strong>Tomcat真正访问的是“Tomcat部署的web项目，以我电脑为例 D:\IntelliJIDEA2018\Test\out\artifacts\TestDemo02_war_exploded”，Tomcat部署的web项目对应着工作空间项目的web目录下的所有资源，而且web-INFO下的classes对应的字节码文件是工作空间src下的Java文件被编译后放到里面的</strong>  </li><li><strong><em>WEB_INFO目录下的资源不能被浏览器直接访问，所以一般不把一些静态资源放到这下面</em></strong>  </li><li>在Tomcat如何断点调试<br>使用“小虫子”启动<br><img src="https://wx3.sinaimg.cn/large/006VKolAly1g6eisf84htj307j02tjr6.jpg" alt="315772ceda1476ff9a038df9da49207">  </li></ul></li></ul><p>​    </p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;Servlet&quot;&gt;&lt;a href=&quot;#Servlet&quot; class=&quot;headerlink&quot; title=&quot;Servlet&quot;&gt;&lt;/a&gt;Servlet&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，
-      
-    
-    </summary>
-    
-    
-      <category term="Servlet" scheme="https://Yogaguo.github.io/categories/Servlet/"/>
-    
-    
-      <category term="servlet" scheme="https://Yogaguo.github.io/tags/servlet/"/>
-    
-  </entry>
   
   <entry>
     <title>Web相关知识入门</title>
