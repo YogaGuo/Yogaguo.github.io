@@ -4,13 +4,11 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Request与Response对象介绍, 小鱼儿的技术博客">
-    <meta name="description" content="Servlet体系结构Servlet-- 接口  
-|  
-GenericServlet-- 抽象类  
-|  
-HttpServlet-- 抽象类  
-GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
+    <meta name="keywords" content="小鱼儿的技术博客">
+    <meta name="description" content="今日内容1. 数据库连接池
+
+2. Spring JDBC : JDBC Template数据库连接池1. 概念：其实就是一个容器(集合)，存放数据库连接的容器。
+        当系统初始化好后，容器被创建，容器中会申请一些连接对象，当用">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -18,7 +16,7 @@ GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Request与Response对象介绍 | 小鱼儿的技术博客</title>
+    <title>小鱼儿的技术博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -284,13 +282,13 @@ GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Request与Response对象介绍
+                        
                     </div>
                 </div>
             </div>
@@ -399,29 +397,12 @@ GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                    <div class="article-tag">
-                        
-                            <a href="/tags/servlet/" target="_blank">
-                                <span class="chip bg-color">servlet</span>
-                            </a>
-                        
-                    </div>
+                          <div class="article-tag">
+                            <span class="chip bg-color">无标签</span>
+                          </div>
                     
                 </div>
                 <div class="col s5 right-align">
-                    
-                    <div class="post-cate">
-                        <i class="fa fa-bookmark fa-fw icon-category"></i>
-                        
-                            <a href="/categories/Servler/" class="post-category" target="_blank">
-                                Servler
-                            </a>
-                        
-                            <a href="/categories/Servler/request/" class="post-category" target="_blank">
-                                request
-                            </a>
-                        
-                    </div>
                     
                 </div>
             </div>
@@ -429,7 +410,7 @@ GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-09-11
+                    2019-09-12
                 </div>
 
                 
@@ -445,228 +426,332 @@ GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h5 id="Servlet体系结构"><a href="#Servlet体系结构" class="headerlink" title="Servlet体系结构"></a>Servlet体系结构</h5><pre><code>Servlet-- 接口  
-|  
-GenericServlet-- 抽象类  
-|  
-HttpServlet-- 抽象类  </code></pre><ul>
-<li>GernericServlet:将Servlet接口中的方法做了默认空实现，只将Service()方法作了抽象，将来定义Servlet类时，可以继承GernericServlet，实现Service()  </li>
-<li>HttpServlet:对http协议的一种封装，为了简化操作  <ul>
-<li>定义类继承HttpServlet  </li>
-<li>复写doGet()/doPost()  <h5 id="Servlet相关配置"><a href="#Servlet相关配置" class="headerlink" title="Servlet相关配置"></a>Servlet相关配置</h5></li>
-</ul>
-</li>
-<li>urlpartten:Servlet访问路径：一个Servlet可以定义多个访问路径  <pre><code>@WebServlet({&quot;/demo05&quot;,&quot;/demo005&quot;})  </code></pre></li>
-<li>路径的定义规则  <ul>
-<li>1 /xxx  </li>
-<li>2 /xxx/xxx:多层路径</li>
-<li>3 <em>.do(</em>为通配符)  <h5 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP:"></a>HTTP:</h5></li>
-</ul>
-</li>
-<li>概念：<strong>Hyper Text Transfer Protocol 超文本传输协议</strong>  </li>
-<li>传输协议：定义了客户端和服务器端通信时，发送数据的格式  </li>
-<li>HTTP协议特点：<ul>
-<li>1 基于TCP/IP的高级协议  </li>
-<li>2 默认端口为80  </li>
-<li>3 基于请求/响应模型：一次请求对应一次响应  </li>
-<li>4 无状态协议：每次请求之间相互独立，不能交互数据  <h5 id="请求消息数据格式"><a href="#请求消息数据格式" class="headerlink" title="请求消息数据格式"></a>请求消息数据格式</h5><h6 id="请求行"><a href="#请求行" class="headerlink" title="请求行"></a>请求行</h6></li>
-</ul>
-</li>
-<li>请求方式  请求url  请求协议/版本  <pre><code>GET/Demo.html HTTP/1.1  </code></pre><ul>
-<li>HTTP有7中请求方式，常用的由2中  <ul>
-<li><strong>GET:==请求参数在请求行中==，即在url后,请求的url是有限制的，不太安全</strong>  </li>
-<li><strong>Post:==请求参数在请求体中==，请求的url没有限制，相对安全</strong><h6 id="请求头"><a href="#请求头" class="headerlink" title="请求头"></a>请求头</h6>请求头名称:请求头值  </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>常见的请求头  <ul>
-<li>User-Agent:浏览器告诉服务器，我访问你使用的浏览器版本信息  </li>
-<li>Referer:<a href="http://localhost/index.html-&gt;" target="_blank" rel="noopener">http://localhost/index.html-&gt;</a> 告诉服务器，我（当前请求）从哪里来  <ul>
-<li>防止别人盗取链接</li>
-<li>做些统计的工作<h6 id="请求空行"><a href="#请求空行" class="headerlink" title="请求空行"></a>请求空行</h6></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>空行：分割Post请求的请求头和请求体的  <h6 id="请求体（正文）"><a href="#请求体（正文）" class="headerlink" title="请求体（正文）"></a>请求体（正文）</h6></li>
-<li>封装Post请求消息的请求参数的<img src="/2019/09/11/Demo5/5.jpg">
+                <h1 id="今日内容"><a href="#今日内容" class="headerlink" title="今日内容"></a>今日内容</h1><pre><code>1. 数据库连接池
 
-</li>
-</ul>
-<pre><code>
-   POST /index.html HTTP/1.1
-Host: localhost:8888
-Connection: keep-alive
-Content-Length: 25
-Cache-Control: max-age=0
-Upgrade-Insecure-Requests: 1
-Origin: null
-Content-Type: application/x-www-form-urlencoded
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
-Accept-Encoding: gzip, deflate, br
-Accept-Language: zh-CN,zh-TW;q=0.9,zh;q=0.8,en-US;q=0.7,en;q=0.6
+2. Spring JDBC : JDBC Template</code></pre><h2 id="数据库连接池"><a href="#数据库连接池" class="headerlink" title="数据库连接池"></a>数据库连接池</h2><pre><code>1. 概念：其实就是一个容器(集合)，存放数据库连接的容器。
+        当系统初始化好后，容器被创建，容器中会申请一些连接对象，当用户来访问数据库时，从容器中获取连接对象，用户访问完之后，会将连接对象归还给容器。
 
-uname=yogaguo</code></pre><h5 id="Requset"><a href="#Requset" class="headerlink" title="Requset"></a>Requset</h5><h6 id="request和response对象的基本原理"><a href="#request和response对象的基本原理" class="headerlink" title="request和response对象的基本原理"></a>request和response对象的基本原理</h6><ul>
-<li>1 requset和response对象是由服务器创建的，我们只是使用  </li>
-<li>2 request对象是获取请求消息，response对象是设置响应消息的  </li>
-</ul>
-<h6 id="request对象继承体系结构"><a href="#request对象继承体系结构" class="headerlink" title="request对象继承体系结构"></a>request对象继承体系结构</h6><pre><code>ServletRequest --接口 
-|  
-HttpServletRequest --接口  
-|  实现
-org.apache.catalina.connector.RequestFacade(类)</code></pre><h6 id="request功能"><a href="#request功能" class="headerlink" title="request功能"></a>request功能</h6><ul>
-<li><p>1 获取请求消息数据  </p>
-<ul>
-<li><p>获取请求行数据:<code>Get/TestDemo02/demo02?name=yogaguo HTTP/1.1</code>  </p>
-</li>
-<li><p>方法：  </p>
-<ul>
-<li>1.获取请求方式：<code>String getMethod()</code>  </li>
-<li>==2.获取虚拟目录==(TestDemo02)<code>String getContextPath</code>  </li>
-<li>3.获取Servlet路径(/demo02)<code>String ServletPath()</code>  </li>
-<li>4.获取Get方式的请求参数<code>String getQueryString</code>  </li>
-<li>5.==获取请求的url== <code>/TestDemo02/demo02)</code> <code>String getRequestURI()</code>:返回的是 <code>/TestDemo02/demo</code>,==StringBuffer getRequestURL()==,返回的是<code>http://localhost/TestDemo02/demo02</code>  <ul>
-<li>URL:统一资源定位符：<code>http://loclahost/TestDemo02/demo02</code>  </li>
-<li>URI:统一资源标识符：<code>/TestDemo02/demo02</code></li>
-</ul>
-</li>
-<li>6.获取客户机的IP地址：<code>String getRemoteAddr()</code></li>
-</ul>
-</li>
-<li><p>获取请求头数据:  </p>
-<ul>
-<li>1==String getHeader(String name)== 通过请求头的名称获取请求头的值  </li>
-<li>2 <code>Enumeration&lt;String&gt; getHeaderNames()</code> :获取所有请求头的名称 <strong>(Enumeration<string>类似迭代器)</string></strong></li>
-</ul>
-</li>
-<li><p>获取请求体数据  </p>
-<ul>
-<li>只有==Post==请求方式才有请求体;在请求体中封装了Post请求的请求参数  </li>
-<li>获取步骤：  <ul>
-<li>1.获取流对象  <ul>
-<li>1.<code>BufferedReader getReader()</code> ,获取字符输入流  </li>
-<li>2.<code>ServletInputStream getInputStream()</code> ,获取字节输入流</li>
-</ul>
-</li>
-<li>2.再从流对象中拿数据  <pre><code>BufferedReader reader=req.getReader();
-String line=null;
-while((line=reader.readLine())!=null){
-  System.out.println(line);
-}  </code></pre></li>
-</ul>
-</li>
-<li>其他方法：  <ul>
-<li>1.获取请求参数的通用方法  <ul>
-<li>String getParamater(String name):根据参数名获取参数值；String getParameterValues(String name):根据参数名获取参数值的数组  </li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>Enumeration&lt;String&gt; parameterNames=req.getParameterNames();
-            while(parameterNames.hasMoreElements()){
-               String name= parameterNames.nextElement();
-                System.out.println(name);
-                String value=req.getParameter(name);
-                System.out.println(value);
-                System.out.println(&quot;---------------------&quot;);
-            }  </code></pre>  <img src="/2019/09/11/Demo5/6.jpg"> 
-<ul>
-<li>中文乱码问题：  <ul>
-<li>Get方式：Tomcat8已经将中文乱码问题解决了</li>
-<li>Post方式：会乱码，解决办法，在获取参数时，设置request的编码<code>req.setCharacterEncoding(&quot;utf-8&quot;);</code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>2.请求转发:一种在服务器内部的资源跳转方式<ul>
-<li>步骤  <ul>
-<li>1.通过request对象获取请求转发器对象: <code>RequestDispatcher getRequestDispatcher(String path)</code>  </li>
-<li>2.通过RequestDispatcher对象来进行转发：<code>forward(ServletRequest request,ServletResponse response)</code>  </li>
-</ul>
-</li>
-<li>==转发特点==：<ul>
-<li>1.==浏览器地址栏路径不发生变化==  </li>
-<li>2.只能转发到当前服务器内部的资源中  </li>
-<li>3.==转发是一次请求==</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>@WebServlet(&quot;/requestDemo7&quot;)
-public class RequestDemo07 extends HttpServlet {
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(&quot;demo7被访问了。。。&quot;);
-        //转发到demo8资源
-        req.getRequestDispatcher(&quot;/requestDemo8&quot;).forward(req,resp);
-    }
+2. 好处：
+    1. 节约资源
+    2. 用户访问高效
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-         this.doPost(req,resp);
-    }
-}  
+3. 实现：
+    1. 标准接口：DataSource   javax.sql包下的
+        1. 方法：
+            * 获取连接：getConnection()
+            * 归还连接：Connection.close()。如果连接对象Connection是从连接池中获取的，那么调用Connection.close()方法，则不会再关闭连接了。而是归还连接
 
-@WebServlet(&quot;/requestDemo8&quot;)
-public class RequestDemo08 extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(&quot;Demo8被访问了&quot;);
-    }
+    2. 一般我们不去实现它，有数据库厂商来实现
+        1. C3P0：数据库连接池技术
+        2. Druid：数据库连接池实现技术，由阿里巴巴提供的
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-         this.doGet(req,resp);
-    }
-}  
-demo7被访问了。。。
-Demo8被访问了
 
-</code></pre><ul>
-<li><p>3.共享数据:</p>
-<ul>
-<li>域对象：一个有作用范围的对象，可以在范围内共享数据</li>
-<li>==request域：代表一次请求的范围，所以request域一般用于请求转发的多个资源中取共享数据==  </li>
-<li>方法：  <ul>
-<li>1.setAttribute(String name,Object obj):存储数据  </li>
-<li>2.Object getAttribute(String name):通过键获取值  </li>
-<li>3.void removeAttribute(String name):通过键移除键值对</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>4.获取ServletContext  </p>
-<h6 id="案例：用户登录"><a href="#案例：用户登录" class="headerlink" title="案例：用户登录"></a>案例：用户登录</h6><ul>
-<li><p>用户登录案例需求  </p>
-<ul>
-<li><p>1.编写login.html登录页面  </p>
-</li>
-<li><p>2.使用Druid数据库连接池技术，操作mysql  </p>
-</li>
-<li><p>3.使用JDBCTemplate技术封装JDBC  </p>
-</li>
-<li><p>4.登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你  </p>
-</li>
-<li><p>5.登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误</p>
-<p>​     </p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>​<br>​        </p>
-<p>​    </p>
-<p>​     </p>
+4. C3P0：数据库连接池技术
+    * 步骤：
+        1. 导入jar包 (两个) c3p0-0.9.5.2.jar mchange-commons-java-0.2.12.jar ，
+            * 不要忘记导入数据库驱动jar包
+        2. 定义配置文件：
+            * 名称： c3p0.properties 或者 c3p0-config.xml
+            * 路径：直接将文件放在src目录下即可。
 
+        3. 创建核心对象 数据库连接池对象 ComboPooledDataSource
+        4. 获取连接： getConnection
+    * 代码：
+         //1.创建数据库连接池对象
+        DataSource ds  = new ComboPooledDataSource();
+        //2. 获取连接对象
+        Connection conn = ds.getConnection();
+5. Druid：数据库连接池实现技术，由阿里巴巴提供的
+    1. 步骤：
+        1. 导入jar包 druid-1.0.9.jar
+        2. 定义配置文件：
+            * 是properties形式的
+            * 可以叫任意名称，可以放在任意目录下
+        3. 加载配置文件。Properties
+        4. 获取数据库连接池对象：通过工厂来来获取  DruidDataSourceFactory
+        5. 获取连接：getConnection
+    * 代码：
+         //3.加载配置文件
+        Properties pro = new Properties();
+        InputStream is = DruidDemo.class.getClassLoader().getResourceAsStream(&quot;druid.properties&quot;);
+        pro.load(is);
+        //4.获取连接池对象
+        DataSource ds = DruidDataSourceFactory.createDataSource(pro);
+        //5.获取连接
+        Connection conn = ds.getConnection();
+    2. 定义工具类
+        1. 定义一个类 JDBCUtils
+        2. 提供静态代码块加载配置文件，初始化连接池对象
+        3. 提供方法
+            1. 获取连接方法：通过数据库连接池获取连接
+            2. 释放资源
+            3. 获取连接池的方法
+
+
+    * 代码：
+        public class JDBCUtils {
+
+            //1.定义成员变量 DataSource
+            private static DataSource ds ;
+
+            static{
+                try {
+                    //1.加载配置文件
+                    Properties pro = new Properties();
+                    pro.load(JDBCUtils.class.getClassLoader().getResourceAsStream(&quot;druid.properties&quot;));
+                    //2.获取DataSource
+                    ds = DruidDataSourceFactory.createDataSource(pro);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            /**
+             * 获取连接
+             */
+            public static Connection getConnection() throws SQLException {
+                return ds.getConnection();
+            }
+
+            /**
+             * 释放资源
+             */
+            public static void close(Statement stmt,Connection conn){
+               /* if(stmt != null){
+                    try {
+                        stmt.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(conn != null){
+                    try {
+                        conn.close();//归还连接
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }*/
+
+               close(null,stmt,conn);
+            }
+
+
+            public static void close(ResultSet rs , Statement stmt, Connection conn){
+
+
+                if(rs != null){
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                if(stmt != null){
+                    try {
+                        stmt.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(conn != null){
+                    try {
+                        conn.close();//归还连接
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            /**
+             * 获取连接池方法
+             */
+
+            public static DataSource getDataSource(){
+                return  ds;
+            }
+
+        }</code></pre><h2 id="Spring-JDBC"><a href="#Spring-JDBC" class="headerlink" title="Spring JDBC"></a>Spring JDBC</h2><pre><code>* Spring框架对JDBC的简单封装。提供了一个JDBCTemplate对象简化JDBC的开发
+* 步骤：
+    1. 导入jar包
+    2. 创建JdbcTemplate对象。依赖于数据源DataSource
+        * JdbcTemplate template = new JdbcTemplate(ds);
+
+    3. 调用JdbcTemplate的方法来完成CRUD的操作
+        * update():执行DML语句。增、删、改语句
+        * queryForMap():查询结果将结果集封装为map集合，将列名作为key，将值作为value 将这条记录封装为一个map集合
+            * 注意：这个方法查询的结果集长度只能是1
+        * queryForList():查询结果将结果集封装为list集合
+            * 注意：将每一条记录封装为一个Map集合，再将Map集合装载到List集合中
+        * query():查询结果，将结果封装为JavaBean对象
+            * query的参数：RowMapper
+                * 一般我们使用BeanPropertyRowMapper实现类。可以完成数据到JavaBean的自动封装
+                * new BeanPropertyRowMapper&lt;类型&gt;(类型.class)
+        * queryForObject：查询结果，将结果封装为对象
+            * 一般用于聚合函数的查询
+
+    4. 练习：
+        * 需求：
+            1. 修改1号数据的 salary 为 10000
+            2. 添加一条记录
+            3. 删除刚才添加的记录
+            4. 查询id为1的记录，将其封装为Map集合
+            5. 查询所有记录，将其封装为List
+            6. 查询所有记录，将其封装为Emp对象的List集合
+            7. 查询总记录数
+
+        * 代码：
+
+            import cn.itcast.domain.Emp;
+            import cn.itcast.utils.JDBCUtils;
+            import org.junit.Test;
+            import org.springframework.jdbc.core.BeanPropertyRowMapper;
+            import org.springframework.jdbc.core.JdbcTemplate;
+            import org.springframework.jdbc.core.RowMapper;
+
+            import java.sql.Date;
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.util.List;
+            import java.util.Map;
+
+            public class JdbcTemplateDemo2 {
+
+                //Junit单元测试，可以让方法独立执行
+
+
+                //1. 获取JDBCTemplate对象
+                private JdbcTemplate template = new JdbcTemplate(JDBCUtils.getDataSource());
+                /**
+                 * 1. 修改1号数据的 salary 为 10000
+                 */
+                @Test
+                public void test1(){
+
+                    //2. 定义sql
+                    String sql = &quot;update emp set salary = 10000 where id = 1001&quot;;
+                    //3. 执行sql
+                    int count = template.update(sql);
+                    System.out.println(count);
+                }
+
+                /**
+                 * 2. 添加一条记录
+                 */
+                @Test
+                public void test2(){
+                    String sql = &quot;insert into emp(id,ename,dept_id) values(?,?,?)&quot;;
+                    int count = template.update(sql, 1015, &quot;郭靖&quot;, 10);
+                    System.out.println(count);
+
+                }
+
+                /**
+                 * 3.删除刚才添加的记录
+                 */
+                @Test
+                public void test3(){
+                    String sql = &quot;delete from emp where id = ?&quot;;
+                    int count = template.update(sql, 1015);
+                    System.out.println(count);
+                }
+
+                /**
+                 * 4.查询id为1001的记录，将其封装为Map集合
+                 * 注意：这个方法查询的结果集长度只能是1
+                 */
+                @Test
+                public void test4(){
+                    String sql = &quot;select * from emp where id = ? or id = ?&quot;;
+                    Map&lt;String, Object&gt; map = template.queryForMap(sql, 1001,1002);
+                    System.out.println(map);
+                    //{id=1001, ename=孙悟空, job_id=4, mgr=1004, joindate=2000-12-17, salary=10000.00, bonus=null, dept_id=20}
+
+                }
+
+                /**
+                 * 5. 查询所有记录，将其封装为List
+                 */
+                @Test
+                public void test5(){
+                    String sql = &quot;select * from emp&quot;;
+                    List&lt;Map&lt;String, Object&gt;&gt; list = template.queryForList(sql);
+
+                    for (Map&lt;String, Object&gt; stringObjectMap : list) {
+                        System.out.println(stringObjectMap);
+                    }
+                }
+
+                /**
+                 * 6. 查询所有记录，将其封装为Emp对象的List集合
+                 */
+
+                @Test
+                public void test6(){
+                    String sql = &quot;select * from emp&quot;;
+                    List&lt;Emp&gt; list = template.query(sql, new RowMapper&lt;Emp&gt;() {
+
+                        @Override
+                        public Emp mapRow(ResultSet rs, int i) throws SQLException {
+                            Emp emp = new Emp();
+                            int id = rs.getInt(&quot;id&quot;);
+                            String ename = rs.getString(&quot;ename&quot;);
+                            int job_id = rs.getInt(&quot;job_id&quot;);
+                            int mgr = rs.getInt(&quot;mgr&quot;);
+                            Date joindate = rs.getDate(&quot;joindate&quot;);
+                            double salary = rs.getDouble(&quot;salary&quot;);
+                            double bonus = rs.getDouble(&quot;bonus&quot;);
+                            int dept_id = rs.getInt(&quot;dept_id&quot;);
+
+                            emp.setId(id);
+                            emp.setEname(ename);
+                            emp.setJob_id(job_id);
+                            emp.setMgr(mgr);
+                            emp.setJoindate(joindate);
+                            emp.setSalary(salary);
+                            emp.setBonus(bonus);
+                            emp.setDept_id(dept_id);
+
+                            return emp;
+                        }
+                    });
+
+
+                    for (Emp emp : list) {
+                        System.out.println(emp);
+                    }
+                }
+
+                /**
+                 * 6. 查询所有记录，将其封装为Emp对象的List集合
+                 */
+
+                @Test
+                public void test6_2(){
+                    String sql = &quot;select * from emp&quot;;
+                    List&lt;Emp&gt; list = template.query(sql, new BeanPropertyRowMapper&lt;Emp&gt;(Emp.class));
+                    for (Emp emp : list) {
+                        System.out.println(emp);
+                    }
+                }
+
+                /**
+                 * 7. 查询总记录数
+                 */
+
+                @Test
+                public void test7(){
+                    String sql = &quot;select count(id) from emp&quot;;
+                    Long total = template.queryForObject(sql, Long.class);
+                    System.out.println(total);
+                }
+
+            }</code></pre>
             </div>
             <hr/>
 
@@ -824,9 +909,9 @@ Demo8被访问了
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《Request与Response对象介绍》
+                    《》
                 </span> 由
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/11/Demo5/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/12/JDBC连接池&JDBCTemplate课堂笔记/" property="cc:attributionName"
                rel="cc:attributionURL">
                 小鱼儿
             </a> 采用
@@ -870,13 +955,13 @@ Demo8被访问了
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2019/09/12/JDBC连接池&JDBCTemplate课堂笔记/">
+                <a href="/2019/09/12/Demo5-1/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="">
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="数据库连接池技术与Spring Template">
                         
-                        <span class="card-title"></span>
+                        <span class="card-title">数据库连接池技术与Spring Template</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -894,11 +979,23 @@ Demo8被访问了
                         </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            小鱼儿
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/JDBC/" class="post-category" target="_blank">
+                                    JDBC
+                                </a>
+                            
                             
                         </span>
                     </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/连接池/" target="_blank">
+                        <span class="chip bg-color">连接池</span>
+                    </a>
+                    
                 </div>
                 
             </div>
@@ -910,22 +1007,24 @@ Demo8被访问了
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/09/11/Demo33/">
+                <a href="/2019/09/11/Demo5/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Servlet与request入门（一)">
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Request与Response对象介绍">
                         
-                        <span class="card-title">Servlet与request入门（一)</span>
+                        <span class="card-title">Request与Response对象介绍</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Servlet
-概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，定义了Java类被浏览器访问到(tomcat识别)的规则 
-将来我们自定义一个类，实现复写Servlet接口，复写方法.  快速入门：
-
+                            Servlet体系结构Servlet-- 接口  
+|  
+GenericServlet-- 抽象类  
+|  
+HttpServlet-- 抽象类  
+GernericServlet:将Servlet接口中的方法做了默认空实现，只将Ser
                         
                     </div>
                     <div class="publish-info">
@@ -936,12 +1035,12 @@ Demo8被访问了
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Servlet/" class="post-category" target="_blank">
-                                    Servlet
+                            <a href="/categories/Servler/" class="post-category" target="_blank">
+                                    Servler
                                 </a>
                             
-                            <a href="/categories/Servlet/Tomcat/" class="post-category" target="_blank">
-                                    Tomcat
+                            <a href="/categories/Servler/request/" class="post-category" target="_blank">
+                                    request
                                 </a>
                             
                             
