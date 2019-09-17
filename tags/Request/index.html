@@ -4,8 +4,8 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="分类: Tomcat, 小鱼儿的技术博客">
-    <meta name="description" content="分类: Tomcat | 小鱼儿的技术博客">
+    <meta name="keywords" content="标签: Request, 小鱼儿的技术博客">
+    <meta name="description" content="标签: Request | 小鱼儿的技术博客">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -13,7 +13,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>分类: Tomcat | 小鱼儿的技术博客</title>
+    <title>标签: Request | 小鱼儿的技术博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -305,60 +305,58 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
 
     
 
-<div id="category-cloud" class="container chip-container">
+<div id="tags" class="container chip-container">
     <div class="card">
         <div class="card-content">
             <div class="tag-title center-align">
-                <i class="fa fa-bookmark"></i>&nbsp;&nbsp;文章分类
+                <i class="fa fa-tags"></i>&nbsp;&nbsp;文章标签
             </div>
             <div class="tag-chips">
                 
                 
-                
-                <a href="/categories/Servlet/" title="Servlet: 3">
+                <a href="/tags/Web/" title="Web: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #F9EBEA;">Servlet
-                        <span class="tag-length">3</span>
-                    </span>
-                </a>
-                
-                
-                <a href="/categories/Servler/" title="Servler: 1">
-                    <span class="chip center-align waves-effect waves-light
-                             chip-default "
-                            style="background-color: #F5EEF8;">Servler
+                            data-tagname="Web" style="background-color: #F9EBEA;">Web
                         <span class="tag-length">1</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/Servlet/Tomcat/" title="Tomcat: 1">
+                <a href="/tags/servlet/" title="servlet: 1">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            data-tagname="servlet" style="background-color: #F5EEF8;">servlet
+                        <span class="tag-length">1</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/tags/Request/" title="Request: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-active "
-                            style="background-color: #D5F5E3;">Tomcat
+                            data-tagname="Request" style="background-color: #D5F5E3;">Request
                         <span class="tag-length">1</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/Servler/request/" title="request: 1">
+                <a href="/tags/连接池/" title="连接池: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #E8F8F5;">request
+                            data-tagname="连接池" style="background-color: #E8F8F5;">连接池
                         <span class="tag-length">1</span>
                     </span>
                 </a>
                 
                 
-                <a href="/categories/JDBC/" title="JDBC: 1">
+                <a href="/tags/Response对象/" title="Response对象: 1">
                     <span class="chip center-align waves-effect waves-light
                              chip-default "
-                            style="background-color: #FEF9E7;">JDBC
+                            data-tagname="Response对象" style="background-color: #FEF9E7;">Response对象
                         <span class="tag-length">1</span>
                     </span>
                 </a>
-                
                 
             </div>
         </div>
@@ -370,26 +368,19 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
     <article id="articles" class="container articles">
         <div class="row tags-posts">
             
-            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+            
+            <div class="article tag-post col s12 m6 l4" data-tags="Request" data-aos="fade-up">
                 <div class="card">
-                    <a href="/2019/09/11/Demo33/">
+                    <a href="/2019/09/11/Demo5/">
                         <div class="card-image tag-image">
                             
                             
-                            <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="Servlet与request入门（一)">
+                            <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="Request与Response对象介绍">
                             
-                            <span class="card-title">Servlet与request入门（一)</span>
+                            <span class="card-title">Request与Response对象介绍</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                Servlet
-概念：servlet applet,运行在服务器端的小程序,servlet就是一个接口，定义了Java类被浏览器访问到(tomcat识别)的规则 
-将来我们自定义一个类，实现复写Servlet接口，复写方法.  快速入门：
-
-                            
-                        </div>
                         <div class="publish-info">
                             <span class="publish-date">
                                 <i class="fa fa-clock-o fa-fw icon-date"></i>2019-09-11
@@ -398,28 +389,18 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
                                 
                                 <i class="fa fa-bookmark fa-fw icon-category"></i>
                                 
-                                <a href="/categories/Servlet/" class="post-category" target="_blank">
-                                    Servlet
+                                <a href="/categories/Servler/" class="post-category" target="_blank">
+                                Servler
                                 </a>
                                 
-                                <a href="/categories/Servlet/Tomcat/" class="post-category" target="_blank">
-                                    Tomcat
+                                <a href="/categories/Servler/request/" class="post-category" target="_blank">
+                                request
                                 </a>
                                 
                                 
                             </span>
                         </div>
                     </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/servlet/" target="_blank">
-                            <span class="chip bg-color">servlet</span>
-                        </a>
-                        
-                    </div>
-                    
                 </div>
             </div>
             
