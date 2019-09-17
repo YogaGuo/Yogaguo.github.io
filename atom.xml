@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://Yogaguo.github.io/"/>
-  <updated>2019-09-17T10:48:14.187Z</updated>
+  <updated>2019-09-17T13:01:28.808Z</updated>
   <id>https://Yogaguo.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>一个空格引发的bug</title>
+    <link href="https://Yogaguo.github.io/2019/09/17/Demo2019-9-17/"/>
+    <id>https://Yogaguo.github.io/2019/09/17/Demo2019-9-17/</id>
+    <published>2019-09-17T12:44:16.000Z</published>
+    <updated>2019-09-17T13:01:28.808Z</updated>
+    
+    <content type="html"><![CDATA[<pre class=" language-tex"><code class="language-tex">今天在Tomcat部署本地图片，通过浏览器访问，但是，在html中写好图片超链接后，点击发现报错 500 。。那就代表Tomcat服务器内部有错误，在看看server log ,发现是 Tomcat内部访问不到图片，但是我的图片就在web目录下(IDEA),在本地查看，D:\IntelliJIDEA2018\TestLogin\out\artifacts\TestLogin_war_exploded下也有(这是部署的项目的服务器路径)，弄了好长时间，最后竟然是因为 在html中写图片的超链接时路径多了空格，所以浏览器地址栏显示20%!!!表示有空格，改过来，重启Tomcat即可PS:  真实心酸血泪史呀</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;pre class=&quot; language-tex&quot;&gt;&lt;code class=&quot;language-tex&quot;&gt;今天在Tomcat部署本地图片，通过浏览器访问，但是，在html中写好图片超链接后，点击发现报错 500 。。
+那就代表Tomcat服务器内部有错误，在看看server l
+      
+    
+    </summary>
+    
+    
+      <category term="采坑" scheme="https://Yogaguo.github.io/categories/%E9%87%87%E5%9D%91/"/>
+    
+    
+      <category term="Tomcat" scheme="https://Yogaguo.github.io/tags/Tomcat/"/>
+    
+  </entry>
   
   <entry>
     <title>Response对象的学习及案例</title>
