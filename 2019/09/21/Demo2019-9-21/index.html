@@ -717,58 +717,64 @@ JSP本质就是Servlet,在之前的Serv">
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre>
-<h4 id="登录页面"><a href="#登录页面" class="headerlink" title="登录页面"></a>登录页面</h4><pre class=" language-jsp"><code class="language-jsp"><%-- 9 24 2019 created by intellij idea. user: lenovo date: time: 15:42 to change this template use file | settings templates. --%>
-<%@ page contenttype="text/html;charset=UTF-8" language="java" %>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-    <title>login</title>
-    <script>
-        window.onload = function () {
-            document.getElementById("img").onclick = function () {
-                this.src="/cookie&session/checkcode?time="+new Date().getTime();
-            }
-        }
-    </script>
-    <style>
-        div{
-            color: red;
-        }
-    </style>
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-<body>
-    <form action="/cookie&session/loginServlet" method="post">
-        <table>
-            <tr>
-                <td>用户名</td>
-                <td><input type="text" name="username"></td>
-            </tr>
-            <tr>
-                <td>密码</td>
-                <td><input type="password" name="password"></td>
-            </tr>
-            <tr>
-                <td>验证码</td>
-                <td><input type="text" name="checkCode"></td>
-            </tr>
-            <tr>
-                <td colspan="2"><img id="img" src="/cookie&session/checkcode"></td>
-            </tr>
-            <tr>
-                <td colspan="2"><input type="submit" value="登录"></td>
-            </tr>
-        </table>
+<h4 id="登录页面"><a href="#登录页面" class="headerlink" title="登录页面"></a>登录页面</h4><pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span><span class="token operator">%</span><span class="token operator">--</span>
+  Created by IntelliJ IDEA<span class="token punctuation">.</span>
+  User<span class="token operator">:</span> LENOVO
+  Date<span class="token operator">:</span> <span class="token number">2019</span><span class="token operator">/</span><span class="token number">9</span><span class="token operator">/</span><span class="token number">24</span>
+  Time<span class="token operator">:</span> <span class="token number">15</span><span class="token operator">:</span><span class="token number">42</span>
+  To change <span class="token keyword">this</span> template use File <span class="token operator">|</span> Settings <span class="token operator">|</span> File Templates<span class="token punctuation">.</span>
+<span class="token operator">--</span><span class="token operator">%</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">%</span>@ page contentType<span class="token operator">=</span><span class="token string">"text/html;charset=UTF-8"</span> language<span class="token operator">=</span><span class="token string">"java"</span> <span class="token operator">%</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>html<span class="token operator">></span>
+<span class="token operator">&lt;</span>head<span class="token operator">></span>
+    <span class="token operator">&lt;</span>title<span class="token operator">></span>login<span class="token operator">&lt;</span><span class="token operator">/</span>title<span class="token operator">></span>
+    <span class="token operator">&lt;</span>script<span class="token operator">></span>
+        window<span class="token punctuation">.</span>onload <span class="token operator">=</span> <span class="token function">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            document<span class="token punctuation">.</span><span class="token function">getElementById</span><span class="token punctuation">(</span><span class="token string">"img"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>onclick <span class="token operator">=</span> <span class="token function">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span>src<span class="token operator">=</span><span class="token string">"/cookie&amp;session/checkcode?time="</span><span class="token operator">+</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>script<span class="token operator">></span>
+    <span class="token operator">&lt;</span>style<span class="token operator">></span>
+        div<span class="token punctuation">{</span>
+            color<span class="token operator">:</span> red<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>style<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">></span>
+<span class="token operator">&lt;</span>body<span class="token operator">></span>
+    <span class="token operator">&lt;</span>form action<span class="token operator">=</span><span class="token string">"/cookie&amp;session/loginServlet"</span> method<span class="token operator">=</span><span class="token string">"post"</span><span class="token operator">></span>
+        <span class="token operator">&lt;</span>table<span class="token operator">></span>
+            <span class="token operator">&lt;</span>tr<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span>用户名<span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span><span class="token operator">&lt;</span>input type<span class="token operator">=</span><span class="token string">"text"</span> name<span class="token operator">=</span><span class="token string">"username"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>tr<span class="token operator">></span>
+            <span class="token operator">&lt;</span>tr<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span>密码<span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span><span class="token operator">&lt;</span>input type<span class="token operator">=</span><span class="token string">"password"</span> name<span class="token operator">=</span><span class="token string">"password"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>tr<span class="token operator">></span>
+            <span class="token operator">&lt;</span>tr<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span>验证码<span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td<span class="token operator">></span><span class="token operator">&lt;</span>input type<span class="token operator">=</span><span class="token string">"text"</span> name<span class="token operator">=</span><span class="token string">"checkCode"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>tr<span class="token operator">></span>
+            <span class="token operator">&lt;</span>tr<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td colspan<span class="token operator">=</span><span class="token string">"2"</span><span class="token operator">></span><span class="token operator">&lt;</span>img id<span class="token operator">=</span><span class="token string">"img"</span> src<span class="token operator">=</span><span class="token string">"/cookie&amp;session/checkcode"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>tr<span class="token operator">></span>
+            <span class="token operator">&lt;</span>tr<span class="token operator">></span>
+                <span class="token operator">&lt;</span>td colspan<span class="token operator">=</span><span class="token string">"2"</span><span class="token operator">></span><span class="token operator">&lt;</span>input type<span class="token operator">=</span><span class="token string">"submit"</span> value<span class="token operator">=</span><span class="token string">"登录"</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>td<span class="token operator">></span>
+            <span class="token operator">&lt;</span><span class="token operator">/</span>tr<span class="token operator">></span>
+        <span class="token operator">&lt;</span><span class="token operator">/</span>table<span class="token operator">></span>
 
-    </form>
-    <div><%=request.getattribute("cc_error") =="null" ? "" : request.getattribute("cc_error")%></%=request.getattribute("cc_error")></div>
-    <div><%=request.getattribute("login_error") =="null" ? "" : request.getattribute("login_error") %></%=request.getattribute("login_error")></div>
+    <span class="token operator">&lt;</span><span class="token operator">/</span>form<span class="token operator">></span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">%=</span>request<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"cc_error"</span><span class="token punctuation">)</span> <span class="token operator">==</span> null <span class="token operator">?</span> <span class="token string">""</span> <span class="token operator">:</span> request<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"cc_error"</span><span class="token punctuation">)</span><span class="token operator">%</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+    <span class="token operator">&lt;</span>div<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">%=</span>request<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"login_error"</span><span class="token punctuation">)</span> <span class="token operator">==</span> null <span class="token operator">?</span> <span class="token string">""</span> <span class="token operator">:</span> request<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"login_error"</span><span class="token punctuation">)</span> <span class="token operator">%</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
 
-</body>
-</html>
-</%@></%--></code></pre>
-<h4 id="登录成功页面"><a href="#登录成功页面" class="headerlink" title="登录成功页面"></a>登录成功页面</h4><pre class=" language-jsp"><code class="language-jsp"><%@ page contenttype="text/html;charset=UTF-8" language="java" %><html><head><meta name="generator" content="Hexo 3.9.0">    <title>Title</title></head><body>    <h1><%= request.getsession().getattribute("user")+"，欢迎您！"%></%=></h1></body></html></%@></code></pre>
+<span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">></span>
+</code></pre>
+<h4 id="登录成功页面"><a href="#登录成功页面" class="headerlink" title="登录成功页面"></a>登录成功页面</h4><pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span><span class="token operator">%</span>@ page contentType<span class="token operator">=</span><span class="token string">"text/html;charset=UTF-8"</span> language<span class="token operator">=</span><span class="token string">"java"</span> <span class="token operator">%</span><span class="token operator">></span><span class="token operator">&lt;</span>html<span class="token operator">></span><span class="token operator">&lt;</span>head<span class="token operator">></span>    <span class="token operator">&lt;</span>title<span class="token operator">></span>Title<span class="token operator">&lt;</span><span class="token operator">/</span>title<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>head<span class="token operator">></span><span class="token operator">&lt;</span>body<span class="token operator">></span>    <span class="token operator">&lt;</span>h1<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">%=</span> request<span class="token punctuation">.</span><span class="token function">getSession</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"，欢迎您！"</span><span class="token operator">%</span><span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>h1<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>body<span class="token operator">></span><span class="token operator">&lt;</span><span class="token operator">/</span>html<span class="token operator">></span></code></pre>
 
             </div>
-            <hr>
+            <hr/>
 
             
             <style>
@@ -916,14 +922,18 @@ JSP本质就是Servlet,在之前的Serv">
         
             <div class="center-align">
                 <a rel="license" href="https://creativecommons.org/licenses/by/4.0/deed.zh">
-                    <img alt style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png">
+                    <img alt=""
+                         style="border-width:0"
+                         src="https://i.creativecommons.org/l/by/4.0/88x31.png"/>
                 </a>
             </div>
-            <br>
-            <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">
+            <br/>
+            <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
+                  property="dct:title" rel="dct:type">
                     《JSP与Session初学》
                 </span> 由
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/21/Demo2019-9-21/" property="cc:attributionName" rel="cc:attributionURL">
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/09/21/Demo2019-9-21/" property="cc:attributionName"
+               rel="cc:attributionURL">
                 小鱼儿
             </a> 采用
             <a rel="license" href="https://creativecommons.org/licenses/by/4.0/deed.zh">
@@ -962,7 +972,7 @@ JSP本质就是Servlet,在之前的Serv">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-dot-circle-o"></i>&nbsp;本篇
             </div>
