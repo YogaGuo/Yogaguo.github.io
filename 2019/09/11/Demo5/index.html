@@ -643,12 +643,11 @@ Demo8被访问了
 <li>3.void removeAttribute(String name):通过键移除键值对</li>
 </ul>
 </li>
-<li>4.获取ServletContext  <h3 id="案例：用户登录"><a href="#案例：用户登录" class="headerlink" title="案例：用户登录"></a>案例：用户登录</h3></li>
-<li>用户登录案例<h4 id="编写login-html登录页面"><a href="#编写login-html登录页面" class="headerlink" title="编写login.html登录页面"></a>编写login.html登录页面</h4></li>
+<li>4.获取ServletContext  </li>
 </ul>
 </li>
 </ul>
-<pre class=" language-html"><code class="language-html">  ```html
+<h2 id="案例：用户登录"><a href="#案例：用户登录" class="headerlink" title="案例：用户登录"></a>案例：用户登录</h2><h3 id="编写login-html登录页面"><a href="#编写login-html登录页面" class="headerlink" title="编写login.html登录页面"></a>编写login.html登录页面</h3><pre class=" language-html"><code class="language-html">  ```html
   <span class="token doctype">&lt;!DOCTYPE html></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
@@ -665,7 +664,7 @@ Demo8被访问了
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
   ```</code></pre>
-<h4 id="使用Druid数据库连接池技术，操作mysql"><a href="#使用Druid数据库连接池技术，操作mysql" class="headerlink" title="使用Druid数据库连接池技术，操作mysql"></a>使用Druid数据库连接池技术，操作mysql</h4><pre class=" language-java"><code class="language-java">  ```java
+<h3 id="使用Druid数据库连接池技术，操作mysql"><a href="#使用Druid数据库连接池技术，操作mysql" class="headerlink" title="使用Druid数据库连接池技术，操作mysql"></a>使用Druid数据库连接池技术，操作mysql</h3><pre class=" language-java"><code class="language-java">  ```java
   <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Utils<span class="token punctuation">;</span>
 
   <span class="token keyword">import</span> com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>druid<span class="token punctuation">.</span>pool<span class="token punctuation">.</span>DruidDataSourceFactory<span class="token punctuation">;</span>
@@ -708,7 +707,7 @@ Demo8被访问了
   <span class="token punctuation">}</span>
 
   ```</code></pre>
-<h4 id="使用JDBCTemplate技术封装JDBC"><a href="#使用JDBCTemplate技术封装JDBC" class="headerlink" title="使用JDBCTemplate技术封装JDBC"></a>使用JDBCTemplate技术封装JDBC</h4><pre class=" language-java"><code class="language-java">  ```java
+<h3 id="使用JDBCTemplate技术封装JDBC"><a href="#使用JDBCTemplate技术封装JDBC" class="headerlink" title="使用JDBCTemplate技术封装JDBC"></a>使用JDBCTemplate技术封装JDBC</h3><pre class=" language-java"><code class="language-java">  ```java
   <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">;</span>
 
   <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Utils<span class="token punctuation">.</span>JDBCUtils<span class="token punctuation">;</span>
@@ -749,7 +748,7 @@ Demo8被访问了
   <span class="token punctuation">}</span>
 
   ```</code></pre>
-<h4 id="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"><a href="#登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你" class="headerlink" title="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"></a>登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你</h4><pre class=" language-java"><code class="language-java">  ```java
+<h3 id="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"><a href="#登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你" class="headerlink" title="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"></a>登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你</h3><pre class=" language-java"><code class="language-java">  ```java
   <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
 
   <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Userdao<span class="token punctuation">;</span>
@@ -791,7 +790,7 @@ Demo8被访问了
   <span class="token punctuation">}</span>
 
   ```</code></pre>
-<h4 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h4><pre class=" language-java"><code class="language-java">  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
+<h3 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h3><pre class=" language-java"><code class="language-java">  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
 
   <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>domain<span class="token punctuation">.</span>User<span class="token punctuation">;</span>
 
@@ -825,7 +824,7 @@ Demo8被访问了
       <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 </code></pre>
-<h4 id="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"><a href="#登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误" class="headerlink" title="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"></a>登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误</h4><pre class=" language-java"><code class="language-java"> <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
+<h3 id="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"><a href="#登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误" class="headerlink" title="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"></a>登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误</h3><pre class=" language-java"><code class="language-java"> <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
 
   <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>ServletException<span class="token punctuation">;</span>
   <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>WebServlet<span class="token punctuation">;</span>
@@ -851,10 +850,6 @@ Demo8被访问了
       <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 </code></pre>
-<p>​<br>​<br>​      ​     </p>
-<p>​        </p>
-<p>​    </p>
-<p>​     </p>
 <pre><code></code></pre>
             </div>
             <hr/>
