@@ -494,7 +494,7 @@ HttpServlet-- 抽象类  </code></pre><ul>
 
 </li>
 </ul>
-<pre><code>
+<pre class=" language-xml"><code class="language-xml">
    POST /index.html HTTP/1.1
 Host: localhost:8888
 Connection: keep-alive
@@ -508,7 +508,8 @@ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/a
 Accept-Encoding: gzip, deflate, br
 Accept-Language: zh-CN,zh-TW;q=0.9,zh;q=0.8,en-US;q=0.7,en;q=0.6
 
-uname=yogaguo</code></pre><h5 id="Requset"><a href="#Requset" class="headerlink" title="Requset"></a>Requset</h5><h6 id="request和response对象的基本原理"><a href="#request和response对象的基本原理" class="headerlink" title="request和response对象的基本原理"></a>request和response对象的基本原理</h6><ul>
+uname=yogaguo</code></pre>
+<h5 id="Requset"><a href="#Requset" class="headerlink" title="Requset"></a>Requset</h5><h6 id="request和response对象的基本原理"><a href="#request和response对象的基本原理" class="headerlink" title="request和response对象的基本原理"></a>request和response对象的基本原理</h6><ul>
 <li>1 requset和response对象是由服务器创建的，我们只是使用  </li>
 <li>2 request对象是获取请求消息，response对象是设置响应消息的  </li>
 </ul>
@@ -550,11 +551,12 @@ org.apache.catalina.connector.RequestFacade(类)</code></pre><h6 id="request功�
 <li>2.<code>ServletInputStream getInputStream()</code> ,获取字节输入流</li>
 </ul>
 </li>
-<li>2.再从流对象中拿数据  <pre><code>BufferedReader reader=req.getReader();
-String line=null;
-while((line=reader.readLine())!=null){
-  System.out.println(line);
-}  </code></pre></li>
+<li>2.再从流对象中拿数据  <pre class=" language-java"><code class="language-java">BufferedReader reader<span class="token operator">=</span>req<span class="token punctuation">.</span><span class="token function">getReader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+String line<span class="token operator">=</span>null<span class="token punctuation">;</span>
+<span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>line<span class="token operator">=</span>reader<span class="token punctuation">.</span><span class="token function">readLine</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">!=</span>null<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>line<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>  </code></pre>
+</li>
 </ul>
 </li>
 <li>其他方法：  <ul>
@@ -565,14 +567,15 @@ while((line=reader.readLine())!=null){
 </ul>
 </li>
 </ul>
-<pre><code>Enumeration&lt;String&gt; parameterNames=req.getParameterNames();
-            while(parameterNames.hasMoreElements()){
-               String name= parameterNames.nextElement();
-                System.out.println(name);
-                String value=req.getParameter(name);
-                System.out.println(value);
-                System.out.println(&quot;---------------------&quot;);
-            }  </code></pre>  <img src="/2019/09/11/Demo5/6.jpg"> 
+<pre class=" language-java"><code class="language-java">Enumeration<span class="token operator">&lt;</span>String<span class="token operator">></span> parameterNames<span class="token operator">=</span>req<span class="token punctuation">.</span><span class="token function">getParameterNames</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>parameterNames<span class="token punctuation">.</span><span class="token function">hasMoreElements</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+               String name<span class="token operator">=</span> parameterNames<span class="token punctuation">.</span><span class="token function">nextElement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                String value<span class="token operator">=</span>req<span class="token punctuation">.</span><span class="token function">getParameter</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"---------------------"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>  </code></pre>
+<pre class=" language-markdown"><code class="language-markdown">{% asset_img 6.jpg  %} </code></pre>
 <ul>
 <li>中文乱码问题：  <ul>
 <li>Get方式：Tomcat8已经将中文乱码问题解决了</li>
@@ -588,10 +591,10 @@ while((line=reader.readLine())!=null){
 <li>2.通过RequestDispatcher对象来进行转发：<code>forward(ServletRequest request,ServletResponse response)</code>  </li>
 </ul>
 </li>
-<li>==转发特点==：<ul>
-<li>1.==浏览器地址栏路径不发生变化==  </li>
-<li>2.只能转发到当前服务器内部的资源中  </li>
-<li>3.==转发是一次请求==</li>
+<li><strong>转发特点</strong>：<ul>
+<li>1.<strong>浏览器地址栏路径不发生变化</strong>  </li>
+<li>2.<strong>只能转发到当前服务器内部的资源中</strong>  </li>
+<li>3.<strong>转发是一次请求</strong></li>
 </ul>
 </li>
 </ul>
@@ -599,73 +602,260 @@ while((line=reader.readLine())!=null){
 </ul>
 </li>
 </ul>
-<pre><code>@WebServlet(&quot;/requestDemo7&quot;)
-public class RequestDemo07 extends HttpServlet {
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(&quot;demo7被访问了。。。&quot;);
-        //转发到demo8资源
-        req.getRequestDispatcher(&quot;/requestDemo8&quot;).forward(req,resp);
-    }
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/requestDemo7"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RequestDemo07</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"demo7被访问了。。。"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//转发到demo8资源</span>
+        req<span class="token punctuation">.</span><span class="token function">getRequestDispatcher</span><span class="token punctuation">(</span><span class="token string">"/requestDemo8"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-         this.doPost(req,resp);
-    }
-}  
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+         <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doPost</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>  
 
-@WebServlet(&quot;/requestDemo8&quot;)
-public class RequestDemo08 extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(&quot;Demo8被访问了&quot;);
-    }
+<span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/requestDemo8"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RequestDemo08</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Demo8被访问了"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-         this.doGet(req,resp);
-    }
-}  
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+         <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doGet</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>  
 demo7被访问了。。。
 Demo8被访问了
 
-</code></pre><ul>
-<li><p>3.共享数据:</p>
+</code></pre>
 <ul>
+<li>3.共享数据:<ul>
 <li>域对象：一个有作用范围的对象，可以在范围内共享数据</li>
-<li>==request域：代表一次请求的范围，所以request域一般用于请求转发的多个资源中取共享数据==  </li>
+<li>request域：代表一次请求的范围，所以request域一般用于请求转发的多个资源中取共享数据==  </li>
 <li>方法：  <ul>
 <li>1.setAttribute(String name,Object obj):存储数据  </li>
 <li>2.Object getAttribute(String name):通过键获取值  </li>
 <li>3.void removeAttribute(String name):通过键移除键值对</li>
 </ul>
 </li>
-</ul>
-</li>
-<li><p>4.获取ServletContext  </p>
-<h6 id="案例：用户登录"><a href="#案例：用户登录" class="headerlink" title="案例：用户登录"></a>案例：用户登录</h6><ul>
-<li><p>用户登录案例需求  </p>
-<ul>
-<li><p>1.编写login.html登录页面  </p>
-</li>
-<li><p>2.使用Druid数据库连接池技术，操作mysql  </p>
-</li>
-<li><p>3.使用JDBCTemplate技术封装JDBC  </p>
-</li>
-<li><p>4.登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你  </p>
-</li>
-<li><p>5.登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误</p>
-<p>​     </p>
-</li>
+<li>4.获取ServletContext  <h3 id="案例：用户登录"><a href="#案例：用户登录" class="headerlink" title="案例：用户登录"></a>案例：用户登录</h3></li>
+<li>用户登录案例<h4 id="编写login-html登录页面"><a href="#编写login-html登录页面" class="headerlink" title="编写login.html登录页面"></a>编写login.html登录页面</h4></li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
-<p>​<br>​        </p>
+<pre class=" language-html"><code class="language-html">  ```html
+  <span class="token doctype">&lt;!DOCTYPE html></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>Title<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>form</span> <span class="token attr-name">action</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/day14_test/loginServlet<span class="token punctuation">"</span></span> <span class="token attr-name">method</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>post<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>text<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>username<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>password<span class="token punctuation">"</span></span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>password<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">></span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>input</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>submit<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>登录<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>form</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>
+  ```</code></pre>
+<h4 id="使用Druid数据库连接池技术，操作mysql"><a href="#使用Druid数据库连接池技术，操作mysql" class="headerlink" title="使用Druid数据库连接池技术，操作mysql"></a>使用Druid数据库连接池技术，操作mysql</h4><pre class=" language-java"><code class="language-java">  ```java
+  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Utils<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>druid<span class="token punctuation">.</span>pool<span class="token punctuation">.</span>DruidDataSourceFactory<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>DataSource<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>InputStream<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>Connection<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>SQLException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Properties<span class="token punctuation">;</span>
+  <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
+  <span class="token comment" spellcheck="true">/**
+   * JDBC的工具类，使用的是Druid连接池
+   */</span>
+  <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JDBCUtils</span> <span class="token punctuation">{</span>
+      <span class="token keyword">private</span> <span class="token keyword">static</span> DataSource ds<span class="token punctuation">;</span>
+      <span class="token keyword">static</span> <span class="token punctuation">{</span>
+          Properties properties <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Properties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">try</span> <span class="token punctuation">{</span>
+              <span class="token comment" spellcheck="true">//加载配置文件</span>
+              properties<span class="token punctuation">.</span><span class="token function">load</span><span class="token punctuation">(</span>JDBCUtils<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">getClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getResourceAsStream</span><span class="token punctuation">(</span><span class="token string">"druid.properties"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token comment" spellcheck="true">//初始化连接池对象</span>
+             ds <span class="token operator">=</span> DruidDataSourceFactory<span class="token punctuation">.</span><span class="token function">createDataSource</span><span class="token punctuation">(</span>properties<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+              e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">/**
+       * 获取连接池对象
+       */</span>
+      <span class="token keyword">public</span> <span class="token keyword">static</span> Connection <span class="token function">getConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> SQLException <span class="token punctuation">{</span>
+          <span class="token keyword">return</span> ds<span class="token punctuation">.</span><span class="token function">getConnection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token comment" spellcheck="true">/**
+       * 获取连接Connection对象
+        */</span>
+      <span class="token keyword">public</span> <span class="token keyword">static</span> DataSource <span class="token function">getDataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+          <span class="token keyword">return</span> ds<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  ```</code></pre>
+<h4 id="使用JDBCTemplate技术封装JDBC"><a href="#使用JDBCTemplate技术封装JDBC" class="headerlink" title="使用JDBCTemplate技术封装JDBC"></a>使用JDBCTemplate技术封装JDBC</h4><pre class=" language-java"><code class="language-java">  ```java
+  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Utils<span class="token punctuation">.</span>JDBCUtils<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>domain<span class="token punctuation">.</span>User<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>DataAccessException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span>core<span class="token punctuation">.</span>BeanPropertyRowMapper<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>jdbc<span class="token punctuation">.</span>core<span class="token punctuation">.</span>JdbcTemplate<span class="token punctuation">;</span>
+
+  <span class="token comment" spellcheck="true">/**
+   * 操作数据库中User表
+   */</span>
+  <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
+  <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Userdao</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">/**
+       * 声明JDBCTemplate对象共用
+       */</span>
+      <span class="token keyword">private</span> JdbcTemplate template <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JdbcTemplate</span><span class="token punctuation">(</span>JDBCUtils<span class="token punctuation">.</span><span class="token function">getDataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token comment" spellcheck="true">/**
+       * 登录方法
+       * @param loginUser，只有用户名和密码
+       * @return user的全部信息
+       */</span>
+      <span class="token keyword">public</span> User <span class="token function">login</span><span class="token punctuation">(</span>User loginUser<span class="token punctuation">)</span><span class="token punctuation">{</span>
+          <span class="token keyword">try</span> <span class="token punctuation">{</span>
+              <span class="token comment" spellcheck="true">//编写sql</span>
+              String sql <span class="token operator">=</span> <span class="token string">"select * from user where username = ? and password = ?"</span><span class="token punctuation">;</span>
+              <span class="token comment" spellcheck="true">//调用query方法</span>
+              User user <span class="token operator">=</span> template<span class="token punctuation">.</span><span class="token function">queryForObject</span><span class="token punctuation">(</span>sql<span class="token punctuation">,</span>
+                      <span class="token keyword">new</span> <span class="token class-name">BeanPropertyRowMapper</span><span class="token operator">&lt;</span>User<span class="token operator">></span><span class="token punctuation">(</span>User<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                      loginUser<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>loginUser<span class="token punctuation">.</span><span class="token function">getPassword</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+              <span class="token keyword">return</span> user<span class="token punctuation">;</span>
+          <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">DataAccessException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  ```</code></pre>
+<h4 id="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"><a href="#登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你" class="headerlink" title="登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你"></a>登录成功跳转到SuccessServlet展示：登录成功，用户名，欢迎你</h4><pre class=" language-java"><code class="language-java">  ```java
+  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>dao<span class="token punctuation">.</span>Userdao<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>domain<span class="token punctuation">.</span>User<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>ServletException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>WebServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+  <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
+  <span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/loginServlet"</span><span class="token punctuation">)</span>
+  <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LoginServlet</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+           <span class="token comment" spellcheck="true">//设置编码</span>
+          req<span class="token punctuation">.</span><span class="token function">setCharacterEncoding</span><span class="token punctuation">(</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          String username <span class="token operator">=</span> req<span class="token punctuation">.</span><span class="token function">getParameter</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          String password <span class="token operator">=</span> req<span class="token punctuation">.</span><span class="token function">getParameter</span><span class="token punctuation">(</span><span class="token string">"PASSWORD"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          User loginUser <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          loginUser<span class="token punctuation">.</span><span class="token function">setUsername</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          loginUser<span class="token punctuation">.</span><span class="token function">setPassword</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+          Userdao dao <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Userdao</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          User user <span class="token operator">=</span> dao<span class="token punctuation">.</span><span class="token function">login</span><span class="token punctuation">(</span>loginUser<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span><span class="token punctuation">(</span>user  <span class="token operator">==</span> null<span class="token punctuation">)</span><span class="token punctuation">{</span>
+              req<span class="token punctuation">.</span><span class="token function">getRequestDispatcher</span><span class="token punctuation">(</span><span class="token string">"/failServlet"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+              req<span class="token punctuation">.</span><span class="token function">setAttribute</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               req<span class="token punctuation">.</span><span class="token function">getRequestDispatcher</span><span class="token punctuation">(</span><span class="token string">"/SuccessServlet"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forward</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+           <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doPost</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  ```</code></pre>
+<h4 id="跳转"><a href="#跳转" class="headerlink" title="跳转"></a>跳转</h4><pre class=" language-java"><code class="language-java">  <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>domain<span class="token punctuation">.</span>User<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>ServletException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>WebServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+
+  <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
+  <span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/SuccessServlet"</span><span class="token punctuation">)</span>
+  <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SuccessServlet</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//获取request域中共享的user对象</span>
+          User user <span class="token operator">=</span> <span class="token punctuation">(</span>User<span class="token punctuation">)</span>req<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">if</span><span class="token punctuation">(</span>user <span class="token operator">!=</span> null<span class="token punctuation">)</span><span class="token punctuation">{</span>
+              <span class="token comment" spellcheck="true">//给页面写句话</span>
+              <span class="token comment" spellcheck="true">//设置页面编码</span>
+              resp<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"text/html;charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+              <span class="token comment" spellcheck="true">//输出到页面上</span>
+              resp<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"登录成功！"</span><span class="token operator">+</span>user<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">",欢迎你"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+
+      <span class="token punctuation">}</span>
+
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+          <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doPost</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<h4 id="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"><a href="#登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误" class="headerlink" title="登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误"></a>登录失败，跳转到FailServlet展示：登录失败，用于名或密码错误</h4><pre class=" language-java"><code class="language-java"> <span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>web<span class="token punctuation">.</span>servlet<span class="token punctuation">;</span>
+
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>ServletException<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>WebServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServlet<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
+  <span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
+  <span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
+  <span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/failServlet"</span><span class="token punctuation">)</span>
+  <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">FailServlet</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+           <span class="token comment" spellcheck="true">//给页面写句话</span>
+          <span class="token comment" spellcheck="true">//设置页面编码</span>
+          resp<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"text/html;charset = utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token comment" spellcheck="true">//输出到页面上</span>
+          resp<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"登录失败，用户名或密码错误"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+
+      <span class="token annotation punctuation">@Override</span>
+      <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
+           <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doPost</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>​<br>​<br>​      ​     </p>
+<p>​        </p>
 <p>​    </p>
 <p>​     </p>
-
+<pre><code></code></pre>
             </div>
             <hr/>
 
