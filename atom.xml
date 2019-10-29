@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://Yogaguo.github.io/"/>
-  <updated>2019-10-28T10:07:03.045Z</updated>
+  <updated>2019-10-29T10:15:47.274Z</updated>
   <id>https://Yogaguo.github.io/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before</title>
+    <link href="https://Yogaguo.github.io/2019/10/29/2019-10-29/"/>
+    <id>https://Yogaguo.github.io/2019/10/29/2019-10-29/</id>
+    <published>2019-10-29T08:33:24.000Z</published>
+    <updated>2019-10-29T10:15:47.274Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p><p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p><p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p><p>在线程执行时，首先从主存中的read值，在load到工作内存中，交给CPU处理，执行完毕，再给工作内存中的变量重写赋值，最后刷新回主存。</p><h2 id="指令重排"><a href="#指令重排" class="headerlink" title="指令重排"></a>指令重排</h2><p>在执行程序时，为了提高性能，编译期和处理器常常会对指令进行重排序。</p><h3 id="数据依懒性"><a href="#数据依懒性" class="headerlink" title="数据依懒性"></a>数据依懒性</h3><p>如果两个操作操作访问同一个变量，且这两个操作中有一个 <strong>写操作</strong>，此时这两个操作就存在数据依懒性。</p><p>只要重排这两个操作的执行顺序，执行结果就会被改变！所以<strong>编译期和处理器不会改变存在数据依懒性的两个操作的执行顺序</strong>。</p><h3 id="as-if-serial-有序性"><a href="#as-if-serial-有序性" class="headerlink" title="as-if-serial(有序性)"></a>as-if-serial(有序性)</h3><p>不管如何重排序，<strong>单线程</strong>的程序执行结果不会被改变。编译期和处理器必须遵守 as-if-serial语义。所以编译期和处理器不会对存在数据依懒性的操作重排序。</p><p>as-if-serial语义把单线程程序 “保护起来”，</p><h3 id="happens-before-有序性"><a href="#happens-before-有序性" class="headerlink" title="happens-before(有序性)"></a>happens-before(有序性)</h3><p><strong>happens-before 要求前一个操作（执行的结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前。并不要求前一个操作必须要在后一个之前执行</strong></p><ul><li><p>程序顺序规则：一个线程中的每个操作，happens-before 于该线程中的任意后续操作</p></li><li><p>监视器锁规则：对一个锁的解锁，happens-before 于随后对这个锁的加锁</p></li><li><p>volatile:对一个volatile域的写，happens-before 于后续任意对这个 volatile 域的读</p></li><li><p>传递性：A happens-before B    B happens-before C ——》A happens-before C</p></li><li><p>start() 规定：线程 A 执行操作 ThreadB.start(启动线程B)，则线程 A 的 ThreadB.start 操作 happens-before 于线程B的任意操作</p><ul><li>比如：线程A在执行ThreadB.start()之前修改了一些共享变量，线程B在开始执行时会读到修改的变量</li></ul></li><li><p>join()规则：线程A执行操作Thread.join()并成功返回，则线程B中任意操作 happens-before于线程A从Thread.join()操作成功返回。</p></li></ul><h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><p>在单线程中，存在 as-if-serial，所以不会不会改变执行结果。但在多线程中，重排序会对执行结果修改。</p><p>当程序未正确同步时，就可能存在<strong>数据竞争</strong>（在一个线程读，在一个线程写，写与读未同步），当存在数据竞争时，运行结果往往不一样。如果一个多线程正确同步。就没有数据竞争。JMM对正确同步的多线程程序内存一致性做了保证：即顺序一致性（程序的执行结果与在顺序一致性内心模型中的执行结果相同）。</p><p><strong>而未同步的程序在JMM中执行时，整体上无序，执行结果也未知</strong></p><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">T9</span> <span class="token punctuation">{</span>     <span class="token keyword">boolean</span> runing<span class="token operator">=</span><span class="token boolean">true</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//加上volatile，线程就会结束。否则一直死循环</span>    <span class="token keyword">void</span> <span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m start"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token keyword">while</span><span class="token punctuation">(</span>runing<span class="token punctuation">)</span> <span class="token punctuation">{</span>        <span class="token punctuation">}</span>          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m end"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>     <span class="token punctuation">}</span>    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>        T9 t<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">T9</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span>t<span class="token punctuation">.</span><span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token keyword">try</span> <span class="token punctuation">{</span>            TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>        <span class="token punctuation">}</span>        t<span class="token punctuation">.</span>runing<span class="token operator">=</span><span class="token boolean">false</span><span class="token punctuation">;</span>    <span class="token punctuation">}</span><span class="token punctuation">}</span>当线程t1开始运行的时候，会把running值从内存中读到t1线程的工作区，在运行过程过程中直接使用这个copy，并不会每次都去 读取堆内存，这样，当主线程修改running的值后，t1线程感知不到，所以不会停止运行</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Java内存模型概述&quot;&gt;&lt;a href=&quot;#Java内存模型概述&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型概述&quot;&gt;&lt;/a&gt;Java内存模型概述&lt;/h2&gt;&lt;p&gt;  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件
+      
+    
+    </summary>
+    
+    
+      <category term="Java并发编程" scheme="https://Yogaguo.github.io/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/"/>
+    
+    
+      <category term="Java内存模型" scheme="https://Yogaguo.github.io/tags/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
+    
+      <category term="happens-before" scheme="https://Yogaguo.github.io/tags/happens-before/"/>
+    
+  </entry>
   
   <entry>
     <title>Java设计模式之工厂模式</title>
