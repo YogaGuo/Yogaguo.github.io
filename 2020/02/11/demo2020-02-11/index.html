@@ -4,9 +4,9 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="2019-10-17, 小鱼儿的技术博客">
-    <meta name="description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）
-准备（Preparation）解析（Resolution）初始化（Initiali">
+    <meta name="keywords" content="SQL语句是如何执行的?, 小鱼儿的技术博客">
+    <meta name="description" content="MySQL逻辑架构
+首先头脑中构建一副MySQL个组件是如何协同工作,MySQL最与众不同的地方在于它的存储引擎架构，这种架构的设计将查询处理(Query Processing)及其他系统任务(Server Task)和数据的存储 / 提取">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -14,7 +14,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>2019-10-17 | 小鱼儿的技术博客</title>
+    <title>SQL语句是如何执行的? | 小鱼儿的技术博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -280,13 +280,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        2019-10-17
+                        SQL语句是如何执行的?
                     </div>
                 </div>
             </div>
@@ -395,12 +395,25 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/mysql/" target="_blank">
+                                <span class="chip bg-color">mysql</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/mysql/" class="post-category" target="_blank">
+                                mysql
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -408,21 +421,21 @@
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-10-17
+                    2020-02-11
                 </div>
 
                 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        147
+                        1.6k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        1 分
+                        5 分
                     </div>
                     
                 
@@ -438,14 +451,48 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="类加载机制顺序及具体细节"><a href="#类加载机制顺序及具体细节" class="headerlink" title="类加载机制顺序及具体细节"></a>类加载机制顺序及具体细节</h2><p>首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）</p>
-<p>准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;</p>
-<p>其中 验证 准备 解析 统称为 链接（Linking)</p>
-<h3 id="什么时候进行初始化"><a href="#什么时候进行初始化" class="headerlink" title="什么时候进行初始化"></a>什么时候进行初始化</h3><ul>
-<li>1.遇到 new getstatic  等 4条字节码指令时，如果类没有进行初始化，则先初始化。</li>
-<li>2.使用<strong>反射调用</strong>时。</li>
-<li>3.父类还没有进行初始化时，先触发父类初始化</li>
-<li>4.</li>
+                <h3 id="MySQL逻辑架构"><a href="#MySQL逻辑架构" class="headerlink" title="MySQL逻辑架构"></a>MySQL逻辑架构</h3><ul>
+<li><p>首先头脑中构建一副MySQL个组件是如何协同工作,MySQL最与众不同的地方在于它的存储引擎架构，这种架构的设计将查询处理(Query Processing)及其他系统任务(Server Task)和数据的存储 / 提取分离。更加高效。<br>下面是MySQL的基本架构示意图，从这里可以看出SQL语句在各个组件间的执行过程  </p>
+  <img src="/2020/02/11/demo2020-02-11/mysql.png">
+</li>
+<li><p>最上层并不是MySQL独有的，大多数基于网络的客户端 / 服务器的工具或者服务都有相似的架构，比如连接处理  授权认证。。。。  </p>
+</li>
+</ul>
+<p>  第二次是MySQL的核心服务功能区(Server),包括连接器，查询缓存  分析器  优化器 ，执行器等待核心服务功能，以及所有的内置函数（日期，时间 数学加密),还有所有跨存储引擎的功能都在这一次实现，比如存储过程，触发器，视图等，还有一个通用的日志模块 binglog日志模块。  </p>
+<p>  第三次包含了存储引擎。存储引擎负责数据的存储和提取。架构是插件式的。支持InnoDB,MyISAM,Memory多个存储引擎,其中InnoDB引擎有日志模块redolog 模块。  </p>
+<p>  当执行建表的时候，如果不指定引擎类型，默认使用的就是InnoDB,当然，也可以通过指定引擎的类型选择，在 create table语句中用engine=memory来指定。<br>  如图所示，不同的存储引擎公用一个<strong>Server层</strong></p>
+<ul>
+<li><code>select * from student where id=10;</code></li>
+</ul>
+<h4 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h4><p>第一步会先里连接数据库，<strong>连接器会负责和客户端建立连接，获取权限，维持和管理连接</strong>。如果用户账户密码已通过，连接器会到权限表中查询该用户的所有权限，之后在这个连接里的权限逻辑判断都是会依赖此时读取到的权限数据，也就是说在成功连接后，即使用管理员账号对这个用户权限做了修改，也不会影响已经存在的连接的权限，该用户不受影响的。在连接完成后，如果用户没有后序动作，这个连接就处于空闲态，如果<strong>长时间</strong>客户端没动静，连接器会自动断开，这时间由参数wait_timeout决定，默认8h.  </p>
+<p>在连接断开后，下一次需要重连，在数据库中有长连接，短连接，前者指连接成功后，客户端持续有请求，则一直使用此连接，后者指每次执行很少的查询后就断开连接。下次再次连接。<strong>建立连接是比较耗时的，所以尽量减少建立连接动作，尽量使用长连接，但是全部使用长连接，MySQL内存涨的很快，因为MySQL执行中临时使用的内存是管理在连接对象里，它们只能在连接断开时被释放，所以长期连接积累下来，内存越来越大，最后OOM，MySQL就会异常Restart</strong>。建议使用一段时间后执行 mysql_reset_connection初始化连接资源。会直接恢复到刚刚创建的状态。  </p>
+<h4 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h4><p>连接建立后，执行查询语句的时候，会先查询缓存，Mysql会先校验这个sql是否执行过，以Key-Value的形式缓存在内存中，Key是查询语句，Value是查询的结果。如果缓存key被命中，就会直接返回给客户端，如果没有命中，就会执行后续的操作，完成后也会把结果缓存起来，方便下一次调用。当然在真正执行缓存查询的时候还是会校验用户的权限，是否有该表的查询条件.</p>
+<p><strong>大多数情况下不建议使用查询缓存，因为往往弊大于利。</strong></p>
+<p>查询缓存实现非常频繁，对一个表的更新，这个表所有的查询缓存都会被清空。Mysql 8.0 版本后删除了缓存的功能，官方也是认为该功能在实际的应用场景比较少，所以直接删掉了。  </p>
+<h4 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h4><p>MySQL 没有命中缓存，那么就会进入分析器，分析器主要是用来分析SQL语句是做什么的，分析器也会分为几步：</p>
+<ul>
+<li><p>词法分析  ：分析器会识别SQL语句中的字符串分析是什么，代表什么。从你输入的”select”关键字识别出来，是一条查询语句，把字符串 “ student “ 识别为 “ 表名student “,字符串 “ id “ 识别为 “ 列id “.</p>
+</li>
+<li><p>语法分析：判断你输入的SQL是否正确，是否符合MySQL的语法。如果语句不对，就会出现熟悉的提示信息：”You have an error in your SQL syntax”   </p>
+</li>
+</ul>
+<p>完成这2步之后，mysql就准备开始执行了，但是如何执行，怎么执行是最好的结果呢？这个时候就需要优化器。</p>
+<h4 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h4><ul>
+<li>优化器就是在表中有多个索引时，决定使用哪个索引，多表关联时，决定表间连接顺序，优化器根据自己的优化算法进行选择执行效率最好的一个方案。  </li>
+</ul>
+<h4 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h4><ul>
+<li>在经过分析器知道要做什么，优化器知道该如何做后，进入执行器阶段。先判断此表有无查询权限，如果没有，返回错误信息。如果有权限，就打开表执行，执行器依据引擎定义，使用指定引擎interface，调用InnoDB引擎interface取表第一行，判断 id == 10 ,不是，跳到下一行，重复判断，找到后存入结果集中。</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>Mysql 主要分为Server层和引擎层，Server层主要包括连接器、查询缓存、分析器、优化器、执行器，同时还有一个日志模块（binlog），这个日志模块所有执行引擎都可以共用。</p>
+<p>引擎层是插件式的，目前主要包括，MyISAM,InnoDB,Memory等。</p>
+</li>
+<li><p>查询语句的执行流程如下：权限校验（如果命中缓存）—》查询缓存—》分析器—》优化器—》权限校验—》执行器—》引擎</p>
+</li>
+</ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li>《mysql专栏45讲》</li>
+<li>《高性能mysql第三版》</li>
 </ul>
 
             </div>
@@ -605,9 +652,9 @@
             <br/>
             <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
                   property="dct:title" rel="dct:type">
-                    《2019-10-17》
+                    《SQL语句是如何执行的?》
                 </span> 由
-            <a xmlns:cc="http://creativecommons.org/ns#" href="/2019/10/17/2019-10-17/" property="cc:attributionName"
+            <a xmlns:cc="http://creativecommons.org/ns#" href="/2020/02/11/demo2020-02-11/" property="cc:attributionName"
                rel="cc:attributionURL">
                 小鱼儿
             </a> 采用
@@ -647,48 +694,49 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="fa fa-dot-circle-o"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2019/10/22/2019-10-22/">
+                <a href="/2020/02/11/demo2020-02-11/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="Ajax与JSON">
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="SQL语句是如何执行的?">
                         
-                        <span class="card-title">Ajax与JSON</span>
+                        <span class="card-title">SQL语句是如何执行的?</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            AJAX：1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML
-    1. 异步和同步：客户端和服务器端相互通信的基础上
-        * 客户端必须等待服务器端的响
+                            MySQL逻辑架构
+首先头脑中构建一副MySQL个组件是如何协同工作,MySQL最与众不同的地方在于它的存储引擎架构，这种架构的设计将查询处理(Query Processing)及其他系统任务(Server Task)和数据的存储 / 提取
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-10-22
-                        </span>
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-11
+                            </span>
                         <span class="publish-author">
                             
-                            <i class="fa fa-user fa-fw"></i>
-                            小鱼儿
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/mysql/" class="post-category" target="_blank">
+                                    mysql
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/AJAX/" target="_blank">
-                        <span class="chip bg-color">AJAX</span>
-                    </a>
-                    
-                    <a href="/tags/JSON/" target="_blank">
-                        <span class="chip bg-color">JSON</span>
+                    <a href="/tags/mysql/" target="_blank">
+                        <span class="chip bg-color">mysql</span>
                     </a>
                     
                 </div>
@@ -702,33 +750,32 @@
                 下一篇&nbsp;<i class="fa fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/10/16/2019-10-16/">
+                <a href="/2019/11/19/2019-11-19/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="设计模式之模板方法总结">
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="Morris遍历实现二叉树的三种遍历">
                         
-                        <span class="card-title">设计模式之模板方法总结</span>
+                        <span class="card-title">Morris遍历实现二叉树的三种遍历</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。
-模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义。
-模板方法的程序组成架构
+                            引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).
+首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-10-16
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2019-11-19
                             </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/设计模式/" class="post-category" target="_blank">
-                                    设计模式
+                            <a href="/categories/二叉树/" class="post-category" target="_blank">
+                                    二叉树
                                 </a>
                             
                             
@@ -738,8 +785,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/模板方法/" target="_blank">
-                        <span class="chip bg-color">模板方法</span>
+                    <a href="/tags/Morris遍历，二叉树/" target="_blank">
+                        <span class="chip bg-color">Morris遍历，二叉树</span>
                     </a>
                     
                 </div>
