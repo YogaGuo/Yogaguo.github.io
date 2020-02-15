@@ -5,7 +5,7 @@
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
     <meta name="keywords" content="Spring基础学习02, 小鱼儿的技术博客">
-    <meta name="description" content="前言   
+    <meta name="description" content="前言   Spring基础学习01
 
 
 先用上篇文章学过的基于xml的IOC完成简单的数据库操作 
@@ -14,7 +14,7 @@
 
 Maven工厂构建spring开发环境 ,导入坐标  
    &amp;lt;dependency&gt;
-             &amp;l">
+   ">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -459,7 +459,7 @@ Maven工厂构建spring开发环境 ,导入坐标
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3>   
+                <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3>   <a href="/2020/02/14/Demo2020-02-14blog/" title="Spring基础学习01">Spring基础学习01</a>
 
 <ul>
 <li><p><strong>先用上篇文章学过的基于xml的IOC完成简单的数据库操作</strong> </p>
@@ -770,44 +770,68 @@ public void saveAccount() {
 </li>
 </ul>
 <h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><ul>
-<li>编写数据库配置JdbcConfig.properties文件，放到resources下<pre class=" language-xml"><code class="language-xml">driver=com.mysql.jdbc.Driver
+<li><p>编写数据库配置JdbcConfig.properties文件，放到resources下</p>
+<pre class=" language-xml"><code class="language-xml">driver=com.mysql.jdbc.Driver
 JdbcUrl=jdbc:mysql://localhost:3306/day14
 Jdbc.name=root
 password=123456</code></pre>
 </li>
-<li>编写JdbcCongif类  <pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>config<span class="token punctuation">;</span>
-</code></pre>
+<li><p>编写JdbcCongif类  </p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>config<span class="token punctuation">;</span>
+<span class="token keyword">import</span> com<span class="token punctuation">.</span>mchange<span class="token punctuation">.</span>v2<span class="token punctuation">.</span>c3p0<span class="token punctuation">.</span>ComboPooledDataSource<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>dbutils<span class="token punctuation">.</span>QueryRunner<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Value<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Bean<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>Scope<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> javax<span class="token punctuation">.</span>sql<span class="token punctuation">.</span>DataSource<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JdbcConfig</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span> <span class="token string">"${driver}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String driver<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${JdbcUrl}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String JdbcUrl<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${Jdbc.name}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String username<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${password}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> String password<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">/**
+         * 创建QueryRunner对象
+         * @param dataSource
+         * @return
+         */</span>
+        <span class="token annotation punctuation">@Bean</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"runner"</span><span class="token punctuation">)</span>
+        <span class="token annotation punctuation">@Scope</span><span class="token punctuation">(</span><span class="token string">"prototype"</span><span class="token punctuation">)</span>
+        <span class="token keyword">public</span> QueryRunner <span class="token function">createQueryRunner</span><span class="token punctuation">(</span>DataSource dataSource<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">QueryRunner</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+       <span class="token comment" spellcheck="true">/**
+       * 创建数据源对象
+       * @return
+       */</span>
+      <span class="token annotation punctuation">@Bean</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"dataSource"</span><span class="token punctuation">)</span>
+      <span class="token keyword">public</span> DataSource <span class="token function">createDataSourece</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+          ComboPooledDataSource ds <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ComboPooledDataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token keyword">try</span> <span class="token punctuation">{</span>
+              ds<span class="token punctuation">.</span><span class="token function">setDriverClass</span><span class="token punctuation">(</span>driver<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              ds<span class="token punctuation">.</span><span class="token function">setJdbcUrl</span><span class="token punctuation">(</span>JdbcUrl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              ds<span class="token punctuation">.</span><span class="token function">setUser</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+              ds<span class="token punctuation">.</span><span class="token function">setPassword</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span><span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span><span class="token punctuation">{</span>
+              e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+          <span class="token punctuation">}</span>
+          <span class="token keyword">return</span> ds<span class="token punctuation">;</span>
+      <span class="token punctuation">}</span> </code></pre>
 </li>
-</ul>
-<p>import com.mchange.v2.c3p0.ComboPooledDataSource;<br>import org.apache.commons.dbutils.QueryRunner;<br>import org.springframework.beans.factory.annotation.Value;<br>import org.springframework.context.annotation.Bean;<br>import org.springframework.context.annotation.Scope;</p>
-<p>import javax.sql.DataSource;</p>
-<p>public class JdbcConfig {<br>    @Value( “${driver}”)<br>    private String driver;<br>    @Value(“${JdbcUrl}”)<br>    private String JdbcUrl;<br>    @Value(“${Jdbc.name}”)<br>    private String username;<br>    @Value(“${password}”)<br>    private String password;<br>        /**<br>         * 创建QueryRunner对象<br>         * @param dataSource<br>         * @return<br>         */<br>        @Bean(name = “runner”)<br>        @Scope(“prototype”)<br>        public QueryRunner createQueryRunner(DataSource dataSource){<br>            return new QueryRunner(dataSource);<br>        }</p>
-<pre><code>    /**
-     * 创建数据源对象
-     * @return
-     */
-    @Bean(name = &quot;dataSource&quot;)
-    public DataSource createDataSourece(){
-        ComboPooledDataSource ds = new ComboPooledDataSource();
-        try {
-            ds.setDriverClass(driver);
-            ds.setJdbcUrl(JdbcUrl);
-            ds.setUser(username);
-            ds.setPassword(password);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return ds;
-    }</code></pre><p>}</p>
-<pre><code>- 编写主配置类
-```java
-@Configuration
-@ComponentScan(basePackages = &quot;com.Yogaguo&quot;)
-@Import(JdbcConfig.class)
-@PropertySource(&quot;classpath:jdbcConfig.properties&quot;)
-public class SpringConfiguration {
-    ........
-}</code></pre><ul>
+<li><p>编写主配置类</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@Configuration</span>
+<span class="token annotation punctuation">@ComponentScan</span><span class="token punctuation">(</span>basePackages <span class="token operator">=</span> <span class="token string">"com.Yogaguo"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Import</span><span class="token punctuation">(</span>JdbcConfig<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@PropertySource</span><span class="token punctuation">(</span><span class="token string">"classpath:jdbcConfig.properties"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">SpringConfiguration</span> <span class="token punctuation">{</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span></code></pre>
+</li>
 <li><p><strong>6</strong> <strong>通过注解获取容器：</strong></p>
 <pre class=" language-java"><code class="language-java">ApplicationContext ac <span class="token operator">=</span> 
 <span class="token keyword">new</span> <span class="token class-name">AnnotationConfigApplicationContext</span><span class="token punctuation">(</span>SpringConfiguration<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
@@ -1082,7 +1106,7 @@ public class SpringConfiguration {
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            前言   
+                            前言   Spring基础学习01
 
 
 先用上篇文章学过的基于xml的IOC完成简单的数据库操作 
@@ -1091,7 +1115,7 @@ public class SpringConfiguration {
 
 Maven工厂构建spring开发环境 ,导入坐标  
    &lt;dependency>
-             &l
+   
                         
                     </div>
                     <div class="publish-info">
