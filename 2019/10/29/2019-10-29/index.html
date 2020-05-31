@@ -56,19 +56,19 @@
   };
 </script>
 
-  <meta name="description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。​    在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内">
+  <meta name="description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。">
 <meta name="keywords" content="Java内存模型,happens-before">
 <meta property="og:type" content="article">
 <meta property="og:title" content="&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/10/29/2019-10-29/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。​    在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内">
+<meta property="og:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://yogaguo.github.io/2019/10/29/2019-10-29/01.jpg">
 <meta property="og:updated_time" content="2020-05-31T08:05:27.751Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before">
-<meta name="twitter:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。​    在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内">
+<meta name="twitter:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。">
 <meta name="twitter:image" content="https://yogaguo.github.io/2019/10/29/2019-10-29/01.jpg">
   <link rel="canonical" href="https://Yogaguo.github.io/2019/10/29/2019-10-29/">
 
@@ -335,9 +335,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p><p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p><p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p><a id="more"></a>
-
-
+        <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p><a id="more"></a>
+<p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p>
+<p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p>
 <p>在线程执行时，首先从主存中的read值，在load到工作内存中，交给CPU处理，执行完毕，再给工作内存中的变量重写赋值，最后刷新回主存。</p>
 <h2 id="指令重排"><a href="#指令重排" class="headerlink" title="指令重排"></a>指令重排</h2><p>在执行程序时，为了提高性能，编译期和处理器常常会对指令进行重排序。</p>
 <h3 id="数据依懒性"><a href="#数据依懒性" class="headerlink" title="数据依懒性"></a>数据依懒性</h3><p>如果两个操作操作访问同一个变量，且这两个操作中有一个 <strong>写操作</strong>，此时这两个操作就存在数据依懒性。</p>

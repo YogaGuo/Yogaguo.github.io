@@ -432,7 +432,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="JVM-Run-Time-Data-Area-运行时数据区"><a href="#JVM-Run-Time-Data-Area-运行时数据区" class="headerlink" title="JVM Run-Time Data Area 运行时数据区"></a>JVM Run-Time Data Area 运行时数据区</h2><p>在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图</p><img src="/2019/09/29/Demo2019-9-29/07.png"><img src="/2019/09/29/Demo2019-9-29/08.png"><h3 id="JVM-Stacks-Java虚拟机栈"><a href="#JVM-Stacks-Java虚拟机栈" class="headerlink" title="JVM Stacks   Java虚拟机栈"></a>JVM Stacks   Java虚拟机栈</h3><p>首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它</p><p>具有先进后出的特性。在栈中的数据大小与生命周期都是<strong>确定</strong>的，在方法执行完成后退出栈后，它的生命周期也就</p>
+          <h2 id="JVM-Run-Time-Data-Area-运行时数据区"><a href="#JVM-Run-Time-Data-Area-运行时数据区" class="headerlink" title="JVM Run-Time Data Area 运行时数据区"></a>JVM Run-Time Data Area 运行时数据区</h2><p>在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -557,10 +557,6 @@
       
           <h2 id="JSP入门："><a href="#JSP入门：" class="headerlink" title="JSP入门："></a>JSP入门：</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ul>
 <li>1.Java Server Pages:Java服务器端页面，可以理解为：一个特殊的页面，其中即可以指定html标签，又可以定义java代码，它的作用就是为了<strong>简化书写</strong></li>
-</ul><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul>
-<li><p><strong>JSP本质就是Servlet</strong>,在之前的Servlet中，输出页面标签是由我们自己完成，而在JSP中，它的源码中已经帮我们提前做了html标签的输出</p>
-<p><code>out.write(&quot;标签语句&quot;)</code></p>
-</li>
 </ul>
           <!--noindex-->
           
@@ -1249,51 +1245,7 @@ PS:  真实心酸血泪史呀</code></pre>
 |  
 GenericServlet-- 抽象类  
 |  
-HttpServlet-- 抽象类  </code></pre><ul>
-<li>GernericServlet:将Servlet接口中的方法做了默认空实现，只将Service()方法作了抽象，将来定义Servlet类时，可以继承GernericServlet，实现Service()  </li>
-<li>HttpServlet:对http协议的一种封装，为了简化操作  <ul>
-<li>定义类继承HttpServlet  </li>
-<li>复写doGet()/doPost()  <h5 id="Servlet相关配置"><a href="#Servlet相关配置" class="headerlink" title="Servlet相关配置"></a>Servlet相关配置</h5></li>
-</ul>
-</li>
-<li>urlpartten:Servlet访问路径：一个Servlet可以定义多个访问路径  <pre><code>@WebServlet({&quot;/demo05&quot;,&quot;/demo005&quot;})  </code></pre></li>
-<li>路径的定义规则  <ul>
-<li>1 /xxx  </li>
-<li>2 /xxx/xxx:多层路径</li>
-<li>3 <em>.do(</em>为通配符)  <h5 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP:"></a>HTTP:</h5></li>
-</ul>
-</li>
-<li>概念：<strong>Hyper Text Transfer Protocol 超文本传输协议</strong>  </li>
-<li>传输协议：定义了客户端和服务器端通信时，发送数据的格式  </li>
-<li>HTTP协议特点：<ul>
-<li>1 基于TCP/IP的高级协议  </li>
-<li>2 默认端口为80  </li>
-<li>3 基于请求/响应模型：一次请求对应一次响应  </li>
-<li>4 无状态协议：每次请求之间相互独立，不能交互数据  <h5 id="请求消息数据格式"><a href="#请求消息数据格式" class="headerlink" title="请求消息数据格式"></a>请求消息数据格式</h5><h6 id="请求行"><a href="#请求行" class="headerlink" title="请求行"></a>请求行</h6></li>
-</ul>
-</li>
-<li>请求方式  请求url  请求协议/版本  <pre><code>GET/Demo.html HTTP/1.1  </code></pre><ul>
-<li>HTTP有7中请求方式，常用的由2中  <ul>
-<li><strong>GET:==请求参数在请求行中==，即在url后,请求的url是有限制的，不太安全</strong>  </li>
-<li><strong>Post:==请求参数在请求体中==，请求的url没有限制，相对安全</strong><h6 id="请求头"><a href="#请求头" class="headerlink" title="请求头"></a>请求头</h6>请求头名称:请求头值  </li>
-</ul>
-</li>
-</ul>
-</li>
-<li>常见的请求头  <ul>
-<li>User-Agent:浏览器告诉服务器，我访问你使用的浏览器版本信息  </li>
-<li>Referer:<a href="http://localhost/index.html-&gt;" target="_blank" rel="noopener">http://localhost/index.html-&gt;</a> 告诉服务器，我（当前请求）从哪里来  <ul>
-<li>防止别人盗取链接</li>
-<li>做些统计的工作<h6 id="请求空行"><a href="#请求空行" class="headerlink" title="请求空行"></a>请求空行</h6></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>空行：分割Post请求的请求头和请求体的  <h6 id="请求体（正文）"><a href="#请求体（正文）" class="headerlink" title="请求体（正文）"></a>请求体（正文）</h6></li>
-<li>封装Post请求消息的请求参数的<img src="/2019/09/11/Demo5/5.jpg">
-
-</li>
-</ul>
+HttpServlet-- 抽象类  </code></pre>
           <!--noindex-->
           
             <div class="post-button text-center">

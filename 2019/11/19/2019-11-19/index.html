@@ -56,18 +56,18 @@
   };
 </script>
 
-  <meta name="description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。本题要求空间复杂度为O(1),这就要求使用 Morris 遍历">
+  <meta name="description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).">
 <meta name="keywords" content="Morris遍历，二叉树">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Morris遍历实现二叉树的三种遍历">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/11/19/2019-11-19/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。本题要求空间复杂度为O(1),这就要求使用 Morris 遍历">
+<meta property="og:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2020-05-31T08:05:27.889Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Morris遍历实现二叉树的三种遍历">
-<meta name="twitter:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。本题要求空间复杂度为O(1),这就要求使用 Morris 遍历">
+<meta name="twitter:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).">
   <link rel="canonical" href="https://Yogaguo.github.io/2019/11/19/2019-11-19/">
 
 
@@ -333,9 +333,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p><p>首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。</p><p>本题要求空间复杂度为O(1),这就要求使用 Morris 遍历</p><a id="more"></a>
-
-
+        <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p><a id="more"></a>
+<p>首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。</p>
+<p>本题要求空间复杂度为O(1),这就要求使用 Morris 遍历</p>
 <h3 id="Morris遍历"><a href="#Morris遍历" class="headerlink" title="Morris遍历"></a>Morris遍历</h3><p>Morris遍历的实质就是避免使用栈结构，而是让下层到上层有指针，通过让底层结点指向 null 的空闲指针指向上层某个结点，从而完成下层到上层的移动。因为二叉树的很多结点都有大量空闲指针，比如，某些结点没有右孩子，那么这个结点的 right 指针就指向 null ,Morris遍历正是用了这些空闲指针。</p>
 <p>具体流程：</p>
 <ul>

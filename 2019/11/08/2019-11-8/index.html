@@ -56,18 +56,18 @@
   };
 </script>
 
-  <meta name="description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用">
+  <meta name="description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。">
 <meta name="keywords" content="重写，重载">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从JVM层理解Java方法调用">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/11/08/2019-11-8/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用">
+<meta property="og:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2020-05-31T08:05:27.907Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="从JVM层理解Java方法调用">
-<meta name="twitter:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用">
+<meta name="twitter:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。">
   <link rel="canonical" href="https://Yogaguo.github.io/2019/11/08/2019-11-8/">
 
 
@@ -333,9 +333,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p><p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p><p>在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用称为 <strong>解析</strong>。满足这种要求（编译期可知，运行期不可知）的方法包括：静态方法（与类型有关，在初始化阶段就已确定） 私有方法（外部类不可访问），它们的性质就决定了不可能通过继承什么的重写。</p><a id="more"></a>
+        <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p><p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p><a id="more"></a>
 
-
+<p>在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用称为 <strong>解析</strong>。满足这种要求（编译期可知，运行期不可知）的方法包括：静态方法（与类型有关，在初始化阶段就已确定） 私有方法（外部类不可访问），它们的性质就决定了不可能通过继承什么的重写。</p>
 <p>在JVM中，只要能被<strong>invokestatic</strong>和<strong>invokespecial</strong>指令调用的方法，都满足上述（在解析阶段唯一确定），符合条件的方法：静态方法 私有方法  实例构造器  父类方法。它们 在类加载阶段，会将符号引用解析为该方法的直接引用。</p>
 <h2 id="静态分配"><a href="#静态分配" class="headerlink" title="静态分配"></a>静态分配</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
 

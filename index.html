@@ -487,7 +487,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="Spring概述"><a href="#Spring概述" class="headerlink" title="Spring概述"></a>Spring概述</h3><p>Spring 是分层的 Java SE/EE 应用 full-stack 轻量级开源框架，以 IoC（Inverse Of Control： </p><p>反转控制）和 AOP（Aspect Oriented Programming：面向切面编程）为内核，提供了展现层 Spring  </p><p>MVC 和持久层 Spring JDBC 以及业务层事务管理等众多的企业级应用技术，还能整合开源世界众多 </p>
+          <h3 id="Spring概述"><a href="#Spring概述" class="headerlink" title="Spring概述"></a>Spring概述</h3><p>Spring 是分层的 Java SE/EE 应用 full-stack 轻量级开源框架，以 IoC（Inverse Of Control： </p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -739,7 +739,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p><p>首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。</p><p>本题要求空间复杂度为O(1),这就要求使用 Morris 遍历</p>
+          <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -862,7 +862,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p><p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p><p>在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用称为 <strong>解析</strong>。满足这种要求（编译期可知，运行期不可知）的方法包括：静态方法（与类型有关，在初始化阶段就已确定） 私有方法（外部类不可访问），它们的性质就决定了不可能通过继承什么的重写。</p>
+          <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p><p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1113,7 +1113,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p><p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p><p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p>
+          <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1667,7 +1667,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="类加载机制顺序及具体细节"><a href="#类加载机制顺序及具体细节" class="headerlink" title="类加载机制顺序及具体细节"></a>类加载机制顺序及具体细节</h2><p>首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）</p><p>准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;</p><p>其中 验证 准备 解析 统称为 链接（Linking)</p>
+          <h2 id="类加载机制顺序及具体细节"><a href="#类加载机制顺序及具体细节" class="headerlink" title="类加载机制顺序及具体细节"></a>类加载机制顺序及具体细节</h2><p>首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）</p>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -1790,7 +1790,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="模板方法定义"><a href="#模板方法定义" class="headerlink" title="模板方法定义"></a>模板方法定义</h3><p><strong>模板方法模式(template method pattern</strong>:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。</p><p>模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义. </p><h3 id="模板方法的程序组成架构"><a href="#模板方法的程序组成架构" class="headerlink" title="模板方法的程序组成架构"></a>模板方法的程序组成架构</h3><p>   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。</p>
+          <h3 id="模板方法定义"><a href="#模板方法定义" class="headerlink" title="模板方法定义"></a>模板方法定义</h3><p><strong>模板方法模式(template method pattern</strong>:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。</p>
           <!--noindex-->
           
             <div class="post-button text-center">
