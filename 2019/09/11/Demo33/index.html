@@ -389,7 +389,7 @@
 <li>被销毁：执行destory方法，只执行一次<br>Servlet被销毁时执行，即服务器正常关闭时，<strong>注意：destory方法在Servlet被销毁之前执行，一般用于释放资源</strong>  <h4 id="解决Servlet配置问题"><a href="#解决Servlet配置问题" class="headerlink" title="解决Servlet配置问题"></a>解决Servlet配置问题</h4></li>
 <li>Servlet3.0之后，支持注解配置，可以不需要web.xml  <img src="/2019/09/11/Demo33/02.jpg"></li>
 <li>步骤：  </li>
-</ul>
+</ul><a id="more"></a>
 <p>1.创建JavaEE的项目,选择Servlet的版本，3.0以上，可以不创建web.xml<br>2.定义一个类，实现Servlet接口<br>3.复写方法<br><strong>4.在类上使用@WebServlet注解，进行配置</strong><br><code>@WebServlet(urlPatterns = &quot;/资源路径&quot;)</code>  </p>
 <h4 id="IDEA与Tamcat的相关配置"><a href="#IDEA与Tamcat的相关配置" class="headerlink" title="IDEA与Tamcat的相关配置"></a>IDEA与Tamcat的相关配置</h4><ul>
 <li>1.IDEA会为每一个tomcat部署的项目单独建立一份配置文件<br>查看控制台的输出log:Using CATALINA_BASE:   “C:\Users\LENOVO.IntelliJIdea2018.2\system\tomcat_Test”  </li>

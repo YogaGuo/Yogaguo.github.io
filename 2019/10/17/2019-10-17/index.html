@@ -56,17 +56,17 @@
   };
 </script>
 
-  <meta name="description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification） 准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading; 其中 验证 准备 解析 统称为 链接（Linking) 什么时候进行初始化 1.遇到 new get">
+  <meta name="description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;其中 验证 准备 解析 统称为 链接（Linking)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="2019-10-17">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/10/17/2019-10-17/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification） 准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading; 其中 验证 准备 解析 统称为 链接（Linking) 什么时候进行初始化 1.遇到 new get">
+<meta property="og:description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;其中 验证 准备 解析 统称为 链接（Linking)">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2020-05-31T08:05:27.610Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2019-10-17">
-<meta name="twitter:description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification） 准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading; 其中 验证 准备 解析 统称为 链接（Linking) 什么时候进行初始化 1.遇到 new get">
+<meta name="twitter:description" content="类加载机制顺序及具体细节首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;其中 验证 准备 解析 统称为 链接（Linking)">
   <link rel="canonical" href="https://Yogaguo.github.io/2019/10/17/2019-10-17/">
 
 
@@ -318,9 +318,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="类加载机制顺序及具体细节"><a href="#类加载机制顺序及具体细节" class="headerlink" title="类加载机制顺序及具体细节"></a>类加载机制顺序及具体细节</h2><p>首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）</p>
-<p>准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;</p>
-<p>其中 验证 准备 解析 统称为 链接（Linking)</p>
+        <h2 id="类加载机制顺序及具体细节"><a href="#类加载机制顺序及具体细节" class="headerlink" title="类加载机制顺序及具体细节"></a>类加载机制顺序及具体细节</h2><p>首先知道，类从被加载到虚拟机内存中开始，到卸载出内存，整个生命周期包括：加载 (Loading)  验证（Verification）</p><p>准备（Preparation）解析（Resolution）初始化（Initialization）使用（Using）卸载（Unloading;</p><p>其中 验证 准备 解析 统称为 链接（Linking)</p><a id="more"></a>
+
+
 <h3 id="什么时候进行初始化"><a href="#什么时候进行初始化" class="headerlink" title="什么时候进行初始化"></a>什么时候进行初始化</h3><ul>
 <li>1.遇到 new getstatic  等 4条字节码指令时，如果类没有进行初始化，则先初始化。</li>
 <li>2.使用<strong>反射调用</strong>时。</li>

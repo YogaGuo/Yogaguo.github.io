@@ -56,13 +56,13 @@
   };
 </script>
 
-  <meta name="description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
+  <meta name="description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是： 无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行">
 <meta name="keywords" content="一致性哈希算法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一致性哈希算法的原理">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/11/03/2019-11-03/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
+<meta property="og:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是： 无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/1.png">
 <meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/2.png">
@@ -71,7 +71,7 @@
 <meta property="og:updated_time" content="2020-05-31T08:05:27.795Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="一致性哈希算法的原理">
-<meta name="twitter:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
+<meta name="twitter:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是： 无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行">
 <meta name="twitter:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/1.png">
   <link rel="canonical" href="https://Yogaguo.github.io/2019/11/03/2019-11-03/">
 
@@ -337,13 +337,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="一种常见的场景："><a href="#一种常见的场景：" class="headerlink" title="一种常见的场景："></a>一种常见的场景：</h3><p> 工程师经常使用<strong>服务器集群</strong>来设计和实现<strong>数据缓存</strong>，经典的策略是：</p>
-<ul>
+        <h3 id="一种常见的场景："><a href="#一种常见的场景：" class="headerlink" title="一种常见的场景："></a>一种常见的场景：</h3><p> 工程师经常使用<strong>服务器集群</strong>来设计和实现<strong>数据缓存</strong>，经典的策略是：</p><ul>
 <li><p>无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.</p>
 </li>
 <li><p>如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行</p>
 </li>
-</ul>
+</ul><a id="more"></a>
+
 <p>请注意，这种缓存策略可能带来一个问题：</p>
 <ul>
 <li>如果现在是双十一，我要<strong>加机器</strong>来满足负载，或者是有时候要<strong>去掉</strong>几台机器，N变化了，所有的数据都不得不根据 id 重新计算一遍哈希值，并将哈希值对新的机器取模，然后就是大规模的数据迁移。这个代价很高！</li>
