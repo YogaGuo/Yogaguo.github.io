@@ -1,0 +1,997 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Redis,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis初识">
+<meta property="og:url" content="https://Yogaguo.github.io/2019/10/22/2019-10-23/index.html">
+<meta property="og:site_name" content="小鱼儿的技术博客">
+<meta property="og:description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/1.png">
+<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/2.png">
+<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/3.png">
+<meta property="og:updated_time" content="2020-05-31T08:05:27.641Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis初识">
+<meta name="twitter:description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
+<meta name="twitter:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://Yogaguo.github.io/2019/10/22/2019-10-23/">
+
+
+
+
+
+  <title> Redis初识 | 小鱼儿的技术博客 </title>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小鱼儿的技术博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">走出生活舒适圈</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://Yogaguo.github.io/2019/10/22/2019-10-23/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="小鱼儿">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小鱼儿的技术博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis初识
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-22T17:48:40+08:00">
+                2019-10-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><ul>
+<li>概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之一，也被人们称为数据结构服务器.</li>
+</ul>
+<h3 id="为什么用-Redis"><a href="#为什么用-Redis" class="headerlink" title="为什么用 Redis"></a>为什么用 Redis</h3><p>互联网时代背景下: </p>
+<ul>
+<li><p>当数据量的总大小一个机器放不下时。 </p>
+</li>
+<li><p>数据索引一个机器的内存放不下时。 </p>
+</li>
+<li><p>访问量（读写混合）一个实例放不下时</p>
+</li>
+<li><p>单机时代：</p>
+<img src="/2019/10/22/2019-10-23/1.png">
+
+</li>
+</ul>
+<p>如果每次存储成千上万条数据，这样很会导致mysql的性能很差，存储以及读取速度很慢，然后就演变成缓存+mysql+垂直拆分的方式</p>
+<img src="/2019/10/22/2019-10-23/2.png">
+
+<p>Cache作为中间缓存<br>将所有的数据先保存到缓存中，然后再存入mysql中，减小数据库压力，提高效率。<br>但是当数据再次增加到又一个量级，上面的方式也不能满足需求，大部分网站开始使用主从复制技术来达到读写分离，以提高读写性能和读库的可扩展性。Mysql的master-slave模式成为这个时候的网站标配了。</p>
+<img src="/2019/10/22/2019-10-23/3.png">
+
+<p>主从分离模式<br>在redis的高速缓存，MySQL的主从复制，读写分离的基础之上，这时MySQL主库的写压力开始出现瓶颈，而数据量的持续猛增，高并发下会出现严重的锁问题，大量的高并发MySQL应用开始使用<strong>InnoDB引擎</strong>代替MyISAM。</p>
+<h2 id="Redis的优势"><a href="#Redis的优势" class="headerlink" title="Redis的优势"></a>Redis的优势</h2><ul>
+<li><p>易扩展</p>
+</li>
+<li><p>大数据量提高性能</p>
+</li>
+<li><p>多样灵活的数据格式</p>
+</li>
+</ul>
+<h2 id="Redia的安装与介绍"><a href="#Redia的安装与介绍" class="headerlink" title="Redia的安装与介绍"></a>Redia的安装与介绍</h2><ol>
+<li><p>官网：<a href="https://redis.io" target="_blank" rel="noopener">https://redis.io</a></p>
+</li>
+<li><p>中文网：<a href="http://www.redis.net.cn/" target="_blank" rel="noopener">http://www.redis.net.cn/</a></p>
+</li>
+<li><p>介绍：</p>
+<ul>
+<li>redis.windows.conf：配置文件</li>
+<li>redis-cli.exe：redis的客户端</li>
+<li>redis-server.exe：redis服务器端<h2 id="Redis的数据结构"><a href="#Redis的数据结构" class="headerlink" title="Redis的数据结构"></a>Redis的数据结构</h2>redis存储的是：key,value 格式的数据，其中 key 都是键值对；value 有5种不同的数据结构</li>
+<li>value 的5种数据结构：</li>
+<li>字符串类型 String</li>
+<li>哈希类型 hash  map的格式</li>
+<li>列表类型 list     linkedlist格式</li>
+<li>集合类型   </li>
+<li>有序集合类型  <h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2></li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>字符串操作</p>
+<ul>
+<li><p>存储：<code>set key value</code></p>
+</li>
+<li><p>获取：<code>get key</code></p>
+</li>
+<li><p>删除：<code>del key</code></p>
+</li>
+</ul>
+</li>
+<li><p>哈希类型</p>
+<ul>
+<li><p>存储：<code>hset key field value</code></p>
+</li>
+<li><p>获取：</p>
+<p>​       <code>hget key field</code>:获取指定的field对应的值</p>
+<p>​    <code>hgetall key</code> 获取所有的field和value</p>
+</li>
+<li><p>删除：<code>hdel key field</code></p>
+</li>
+</ul>
+</li>
+<li><p>列表类型：可以添加一个元素到列表的头部（左边）或者尾部（右边）</p>
+<ul>
+<li>添加：<code>lpush key value</code>将元素加入列表左边；</li>
+</ul>
+</li>
+</ul>
+<p>​                          <code>rpush key value</code>将元素加入列表右边</p>
+<p>​         获取：<code>lrange key start end</code>:范围获取</p>
+<p>​         删除：<code>lpop key</code>: 删除列表左边的元素并将元素返回；<code>rpop key</code></p>
+<ul>
+<li><p>集合类型：不允许重复元素，元素无序</p>
+<ul>
+<li>存储：<code>sadd key value</code></li>
+<li>获取：<code>smembers key</code>:获取 set 集合中所有的元素</li>
+<li>删除：<code>srem key value</code>:删除集合中的某个元素</li>
+</ul>
+</li>
+<li><p>有序集合：sortedset 不允许重复元素，元素有序,.每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。</p>
+<ul>
+<li><p>存储：<code>zadd key score value</code></p>
+</li>
+<li><p>获取：<code>zrange key start end</code></p>
+<pre class=" language-r"><code class="language-r"><span class="token number">1</span>. 存储：zadd key score value
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">60</span> zhangsan
+                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">50</span> lisi
+                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">80</span> wangwu
+                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
+            <span class="token number">2</span>. 获取：zrange key start end <span class="token punctuation">[</span>withscores<span class="token punctuation">]</span>
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrange mysort <span class="token number">0</span> <span class="token operator">-</span><span class="token number">1</span>
+                <span class="token number">1</span><span class="token punctuation">)</span> <span class="token string">"lisi"</span>
+                <span class="token number">2</span><span class="token punctuation">)</span> <span class="token string">"zhangsan"</span>
+                <span class="token number">3</span><span class="token punctuation">)</span> <span class="token string">"wangwu"</span>
+
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrange mysort <span class="token number">0</span> <span class="token operator">-</span><span class="token number">1</span> withscores
+                <span class="token number">1</span><span class="token punctuation">)</span> <span class="token string">"zhangsan"</span>
+                <span class="token number">2</span><span class="token punctuation">)</span> <span class="token string">"60"</span>
+                <span class="token number">3</span><span class="token punctuation">)</span> <span class="token string">"wangwu"</span>
+                <span class="token number">4</span><span class="token punctuation">)</span> <span class="token string">"80"</span>
+                <span class="token number">5</span><span class="token punctuation">)</span> <span class="token string">"lisi"</span>
+                <span class="token number">6</span><span class="token punctuation">)</span> <span class="token string">"500"</span>
+            <span class="token number">3</span>. 删除：zrem key value
+                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrem mysort lisi
+                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>通用命令</p>
+<ul>
+<li><code>keys *</code>查询所有的键</li>
+<li><code>type key</code>键值类型</li>
+<li><code>del key</code>删除指定的键值对<h2 id="Redis的持久化"><a href="#Redis的持久化" class="headerlink" title="Redis的持久化"></a>Redis的持久化</h2></li>
+</ul>
+<p>redis 是一个内存数据库，当Redis 服务器重启，或者电脑重启，数据多会丢失，可以将 redis 内存中的数据持久化到硬盘的文件中。</p>
+</li>
+<li><p>Redis 持久化的机制</p>
+<ul>
+<li><p>RDB:默认方式，在一定的间隔时间中，检测 key 的变化情况，然后持久化。</p>
+<ul>
+<li><p>1.具体操作：编辑 redis.windows.conf文件</p>
+<pre class=" language-xml"><code class="language-xml">after 900 sec (15 min) if at least 1 key changed
+#   after 300 sec (5 min) if at least 10 keys changed
+#   after 60 sec if at least 10000 keys changed</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>  ```xm
+  save 900 1
+  save 300 10
+  save 60  10000
+  ```
+
+- 重新启动redis服务器，并指定配置文件名称
+  D:\redis\windows-64\redis-2.8.9&gt;redis-server.exe redis.windows.conf    </code></pre><ul>
+<li>ADF:日志记录的方式，可以记录每一条命令的操作，在每一条命令后，持久化数据（不推荐）</li>
+</ul>
+<h2 id="Java-客户端-Jedis"><a href="#Java-客户端-Jedis" class="headerlink" title="Java 客户端 Jedis"></a>Java 客户端 Jedis</h2><ul>
+<li>Jedis :一款java操作redis数据库的工具.<ul>
+<li><ol>
+<li>下载jedis的jar包<ul>
+<li><ol start="2">
+<li>使用<ul>
+<li><ol>
+<li>获取连接<br><code>Jedis jedis = new Jedis(&quot;localhost&quot;,6379);</code></li>
+</ol>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><ol start="2">
+<li>操作<br><code>jedis.set(&quot;username&quot;,&quot;zhangsan&quot;);</code></li>
+</ol>
+</li>
+<li><ol start="3">
+<li>关闭连接<br><code>jedis.close()</code></li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>2 .Jedis操作各种redis中的数据结构</p>
+<ul>
+<li><p>1.字符串类型 string</p>
+<pre class=" language-java"><code class="language-java"> <span class="token comment" spellcheck="true">//1. 获取连接</span>
+                Jedis jedis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jedis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//如果使用空参构造，默认值 "localhost",6379端口</span>
+                <span class="token comment" spellcheck="true">//2. 操作</span>
+                <span class="token comment" spellcheck="true">//存储</span>
+                jedis<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">,</span><span class="token string">"zhangsan"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">//获取</span>
+                String username <span class="token operator">=</span> jedis<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token comment" spellcheck="true">//可以使用setex()方法存储可以指定过期时间的 key value</span>
+                jedis<span class="token punctuation">.</span><span class="token function">setex</span><span class="token punctuation">(</span><span class="token string">"activecode"</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token string">"hehe"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//将activecode：hehe键值对存入redis，并且20秒后自动删除该键值对</span>
+
+                <span class="token comment" spellcheck="true">//3. 关闭连接</span>
+                jedis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<ul>
+<li><p>哈希类型 hash ： map格式  </p>
+<p>hset</p>
+<p>hget<br>hgetAll</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//1. 获取连接</span>
+               Jedis jedis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jedis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//如果使用空参构造，默认值 "localhost",6379端口</span>
+               <span class="token comment" spellcheck="true">//2. 操作</span>
+               <span class="token comment" spellcheck="true">// 存储hash</span>
+               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"name"</span><span class="token punctuation">,</span><span class="token string">"lisi"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"age"</span><span class="token punctuation">,</span><span class="token string">"23"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"gender"</span><span class="token punctuation">,</span><span class="token string">"female"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+               <span class="token comment" spellcheck="true">// 获取hash</span>
+               String name <span class="token operator">=</span> jedis<span class="token punctuation">.</span><span class="token function">hget</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span> <span class="token string">"name"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+               System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>                   // 获取hash的所有map中的数据
+                   Map&lt;String, String&gt; user = jedis.hgetAll(&quot;user&quot;);
+
+                   // keyset
+                   Set&lt;String&gt; keySet = user.keySet();
+                   for (String key : keySet) {
+                       //获取value
+                       String value = user.get(key);
+                       System.out.println(key + &quot;:&quot; + value);
+                   }
+
+                   //3. 关闭连接
+                   jedis.close();
+   ```</code></pre><h2 id="Jdeis连接池"><a href="#Jdeis连接池" class="headerlink" title="Jdeis连接池"></a>Jdeis连接池</h2><ul>
+<li><ol>
+<li>创建JedisPool连接池对象</li>
+</ol>
+</li>
+<li><ol start="2">
+<li><p>调用方法 getResource()方法获取Jedis连接</p>
+<pre><code> ```java</code></pre><p>连接池工具类</p>
+<pre><code>       public class JedisPoolUtils {
+
+           private static JedisPool jedisPool;
+
+           static{
+               //读取配置文件
+               InputStream is = JedisPoolUtils.class.getClassLoader().getResourceAsStream(&quot;jedis.properties&quot;);
+               //创建Properties对象
+               Properties pro = new Properties();
+               //关联文件
+               try {
+                   pro.load(is);
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+               //获取数据，设置到JedisPoolConfig中
+               JedisPoolConfig config = new JedisPoolConfig();
+               config.setMaxTotal(Integer.parseInt(pro.getProperty(&quot;maxTotal&quot;)));
+               config.setMaxIdle(Integer.parseInt(pro.getProperty(&quot;maxIdle&quot;)));
+
+               //初始化JedisPool
+               jedisPool = new JedisPool(config,pro.getProperty(&quot;host&quot;),Integer.parseInt(pro.getProperty(&quot;port&quot;)));</code></pre></li>
+</ol>
+</li>
+</ul>
+<pre><code>                }
+
+
+                /**
+                 * 获取连接方法
+                 */
+                public static Jedis getJedis(){
+                    return jedisPool.getResource();
+                }
+            }
+      ```</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/22/2019-10-22/" rel="next" title="Ajax与JSON">
+                <i class="fa fa-chevron-left"></i> Ajax与JSON
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/28/2019-10-28/" rel="prev" title="Java设计模式之工厂模式">
+                Java设计模式之工厂模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="小鱼儿">
+          <p class="site-author-name" itemprop="name">小鱼儿</p>
+           
+              <p class="site-description motion-element" itemprop="description">技术博客，Java编程，算法学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">1.</span> <span class="nav-text">Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么用-Redis"><span class="nav-number">1.1.</span> <span class="nav-text">为什么用 Redis</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的优势"><span class="nav-number">2.</span> <span class="nav-text">Redis的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redia的安装与介绍"><span class="nav-number">3.</span> <span class="nav-text">Redia的安装与介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的数据结构"><span class="nav-number">4.</span> <span class="nav-text">Redis的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本命令"><span class="nav-number">5.</span> <span class="nav-text">基本命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的持久化"><span class="nav-number">6.</span> <span class="nav-text">Redis的持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-客户端-Jedis"><span class="nav-number">7.</span> <span class="nav-text">Java 客户端 Jedis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jdeis连接池"><span class="nav-number">8.</span> <span class="nav-text">Jdeis连接池</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小鱼儿</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
