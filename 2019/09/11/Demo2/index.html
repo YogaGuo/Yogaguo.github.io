@@ -1,463 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Web相关知识入门 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Web">
-  
-  
-  
-  
-  <meta name="description" content="Web服务入门介绍 web相关概念回顾  web服务器软件:Tomcat  Servlet入门学习   web相关概念回顾 1.软件架构    1.C/S:客户端/服务器端     2.B/S:浏览器/服务器端 (重点)    2.资源分类    1.静态资源:所有用户访问后，得到的结果都是一样的,静态资源可以直接被浏览器解析 * 如:html,css,Javascript   2.动态资源:每个">
-<meta name="keywords" content="Web">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Web相关知识入门">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/09/11/Demo2/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="Web服务入门介绍 web相关概念回顾  web服务器软件:Tomcat  Servlet入门学习   web相关概念回顾 1.软件架构    1.C/S:客户端/服务器端     2.B/S:浏览器/服务器端 (重点)    2.资源分类    1.静态资源:所有用户访问后，得到的结果都是一样的,静态资源可以直接被浏览器解析 * 如:html,css,Javascript   2.动态资源:每个">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/11/Demo2/!%5B%5D(http://ww1.sinaimg.cn/large/006VKolAly1g6dcz3t5ywj30lv043glj.jpg)">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/11/Demo2/!%5B%5D(http://ww1.sinaimg.cn/large/006VKolAly1g6dd6hai4nj30bc03ka9w.jpg)">
-<meta property="og:updated_time" content="2020-05-31T12:08:57.486Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Web相关知识入门">
-<meta name="twitter:description" content="Web服务入门介绍 web相关概念回顾  web服务器软件:Tomcat  Servlet入门学习   web相关概念回顾 1.软件架构    1.C/S:客户端/服务器端     2.B/S:浏览器/服务器端 (重点)    2.资源分类    1.静态资源:所有用户访问后，得到的结果都是一样的,静态资源可以直接被浏览器解析 * 如:html,css,Javascript   2.动态资源:每个">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/09/11/Demo2/!%5B%5D(http://ww1.sinaimg.cn/large/006VKolAly1g6dcz3t5ywj30lv043glj.jpg)">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-Demo2" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Web相关知识入门
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/09/11/Demo2/" class="article-date">
-	  <time datetime="2019-09-11T09:07:56.000Z" itemprop="datePublished">九月 11, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Web服务入门介绍"><a href="#Web服务入门介绍" class="headerlink" title="Web服务入门介绍"></a>Web服务入门介绍</h2><ul>
-<li><p>web相关概念回顾</p>
-</li>
-<li><p>web服务器软件:Tomcat</p>
-</li>
-<li><p>Servlet入门学习  </p>
-<h3 id="web相关概念回顾"><a href="#web相关概念回顾" class="headerlink" title="web相关概念回顾"></a>web相关概念回顾</h3></li>
-<li><p>1.软件架构  </p>
-<ul>
-<li>1.C/S:客户端/服务器端    </li>
-<li>2.B/S:浏览器/服务器端 (重点) </li>
-</ul>
-</li>
-<li><p>2.资源分类  </p>
-<ul>
-<li>1.静态资源:所有用户访问后，得到的结果都是一样的,静态资源可以直接被浏览器解析 * 如:html,css,Javascript  </li>
-<li>2.动态资源:每个用户访问相同资源后，得到的结果可能不一样 ,动态资源被访问后需要先转为静态资源，再返回给浏览器(Response) *如 servlet/jsp,php  </li>
-</ul>
-</li>
-<li><p>3.网络通讯三要素  </p>
-<ul>
-<li>1.IP:电子设备在网络中的唯一标识 </li>
-<li>2.端口:应用程序在计算机中的唯一标识 0-65535</li>
-<li>3.传输协议:规定了数据传输的规范<ul>
-<li>1.基础协议:  <ul>
-<li>1.tcp:安全的协议，三次握手确认双方都在线，在进行传输 ，速度稍慢 </li>
-<li>2.udp:不安全协议，速度快  <h3 id="web服务器软件"><a href="#web服务器软件" class="headerlink" title="web服务器软件"></a>web服务器软件</h3></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>1.服务器：安装了服务器软件的计算机  </p>
-</li>
-<li><p>2.服务器软件:接受用户的请求，处理请求，做出响应  </p>
-</li>
-<li><p>web服务器软件：接受用户的请求，处理请求，做出响应   </p>
-<ul>
-<li>1.在web服务器软件中可以部署web项目，让用户通过浏览器来访问这些项目  </li>
-<li>2.web容器  </li>
-</ul>
-</li>
-<li><p>3.常见java相关的web服务器软件  </p>
-<ul>
-<li>1.webLogic:oracle公司，大型的JavaEE服务器，支持所有的JavaEE规范，收费的  </li>
-<li>2.webSphere:IBW公司，大型的JavaEE服务器，支持所有的JavaEE规范，收费的    </li>
-<li>3.JBOSS:JBOSS公司，大型的JavaEE服务器，支持所有的JavaEE规范，收费的  </li>
-<li>4.Apache基金组织，中小型的JavaEE服务器，仅仅支持少量的JavaEE规范(servlet/jsp),开源的，免费的  </li>
-</ul>
-</li>
-<li><p>4.JavaEE:Java语言在企业级开发中使用的技术规范的总和，一共规定了13项大的规范  </p>
-<h3 id="Tomcat-web服务器软件"><a href="#Tomcat-web服务器软件" class="headerlink" title="Tomcat:web服务器软件"></a>Tomcat:web服务器软件</h3></li>
-<li><p>1.下载: <a href="http://tomcat.apache.org/" target="_blank" rel="noopener">官网地址</a>  </p>
-</li>
-<li><p>2.安装: 解压压缩包 (<strong>注意：安装目录建议不要有中文和空格</strong>) </p>
-</li>
-<li><p>3.卸载: 删除目录就行  </p>
-</li>
-<li><p>4.启动:bin/startup.bat双击该文件  </p>
-<ul>
-<li>1.访问自己：浏览器输入：(<a href="http://localhost:8888)(我自己该的端口号，默认8080)" target="_blank" rel="noopener">http://localhost:8888)(我自己该的端口号，默认8080)</a> 回车访问  </li>
-<li>2.访问别人:(http://别人ip:8080)  </li>
-<li>3.可能遇到的问题:  <ul>
-<li>1.黑窗口一闪而过：没有正确配置JAVA_HOME环境变量  </li>
-<li>2.启动报错：<ul>
-<li>1.暴力解决-&gt;找到占用的端口号，并且找到对应进程，杀死该进程.  </li>
-<li>2.温柔解决:修改自身端口号,   conf/server.xml     服务器的主配置文件   <strong>注意：改动此文件时先备份，以防改错</strong>  <pre><code>&lt;Connector port=&quot;8888&quot; protocol=&quot;HTTP/1.1&quot;
-       connectionTimeout=&quot;20000&quot;
-       redirectPort=&quot;8443&quot; /&gt;  </code></pre></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>5.关闭:</p>
-<ul>
-<li>1.bin目录命令窗口直接敲  shutdown/catalina stop 二者都可以,或者直接双击shutdown文件</li>
-</ul>
-</li>
-<li><p>6.配置:</p>
-<ul>
-<li>1.部署项目的方式：  <ul>
-<li>1.直接将项目放到webapps目录下即可  <ul>
-<li><ol>
-<li>/hello:项目的访问路径—&gt;虚拟目录  </li>
-</ol>
-</li>
-<li>2.简单部署：将项目打包成war包,再将war包放置到webapps目录下，war包会自动解压  </li>
-</ul>
-</li>
-<li>1.配置conf/server.xml文件  </li>
-<li>1.在conf\Catalina\localhost创建任意名称的xml文件，在文件中编写  </li>
-</ul>
-</li>
-<li>1.静态项目和动态项目  <ul>
-<li>1.目录结构  <ul>
-<li>1.Java动态项目的目录结构  <ul>
-<li>项目根目录  <ul>
-<li>WEB-INF目录：  <ul>
-<li>web.xml:web项目核心配置文件  </li>
-<li>class目录：放置字节码文件  </li>
-<li>lib目录：放置依赖的jar包  </li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>将Tomcat集成到IDEA中，并且创建JavaEE的项目,部署项目  <ul>
-<li>Run-&gt;Edit configurations-&gt;Templates-&gt;Tomcat server-&gt;Local  </li>
-<li>配置Tomcat路径  </li>
-<li><img src="!%5B%5D(http://ww1.sinaimg.cn/large/006VKolAly1g6dcz3t5ywj30lv043glj.jpg)" alt="如图">  </li>
-<li>热部署：保证每次更新资源，Tomcat会自动启动</li>
-<li><img src="!%5B%5D(http://ww1.sinaimg.cn/large/006VKolAly1g6dd6hai4nj30bc03ka9w.jpg)" alt>  </li>
-<li></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/">Web</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/09/11/Demo33/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          Servlet与request入门（一)
-        
-      </div>
-    </a>
-  
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Web服务入门介绍"><span class="nav-number">1.</span> <span class="nav-text">Web服务入门介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#web相关概念回顾"><span class="nav-number">1.1.</span> <span class="nav-text">web相关概念回顾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web服务器软件"><span class="nav-number">1.2.</span> <span class="nav-text">web服务器软件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tomcat-web服务器软件"><span class="nav-number">1.3.</span> <span class="nav-text">Tomcat:web服务器软件</span></a></li></ol></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

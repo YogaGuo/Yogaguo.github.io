@@ -1,473 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Morris遍历实现二叉树的三种遍历 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="二叉树">
-  
-  
-  
-  
-  <meta name="description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1). 首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。 本题要求空间复杂度为O(1),这就要求使用 Morris 遍历 Morris遍历Morris遍历">
-<meta name="keywords" content="二叉树">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Morris遍历实现二叉树的三种遍历">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/11/19/2019-11-19/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1). 首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。 本题要求空间复杂度为O(1),这就要求使用 Morris 遍历 Morris遍历Morris遍历">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-31T12:09:59.826Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Morris遍历实现二叉树的三种遍历">
-<meta name="twitter:description" content="引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1). 首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。 本题要求空间复杂度为O(1),这就要求使用 Morris 遍历 Morris遍历Morris遍历">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-11-19" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Morris遍历实现二叉树的三种遍历
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/11/19/2019-11-19/" class="article-date">
-	  <time datetime="2019-11-19T13:23:38.000Z" itemprop="datePublished">十一月 19, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/算法/">算法</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p>
-<p>首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。</p>
-<p>本题要求空间复杂度为O(1),这就要求使用 Morris 遍历</p>
-<h3 id="Morris遍历"><a href="#Morris遍历" class="headerlink" title="Morris遍历"></a>Morris遍历</h3><p>Morris遍历的实质就是避免使用栈结构，而是让下层到上层有指针，通过让底层结点指向 null 的空闲指针指向上层某个结点，从而完成下层到上层的移动。因为二叉树的很多结点都有大量空闲指针，比如，某些结点没有右孩子，那么这个结点的 right 指针就指向 null ,Morris遍历正是用了这些空闲指针。</p>
-<p>具体流程：</p>
-<ul>
-<li>当前结点为 cur1,cur1无左子树，cur1向右移动，<code>cur1 = cur1.right</code></li>
-<li>cur1有左子树，找左子树最右结点（mostright）<pre><code>  - mostright的右孩子为 null ,右孩子指向 cur1, cur1 向左移动
-      -  mostright的右孩子为 cur,mostright的右孩子指向 null ,cur向右 cur1 = cur1.right.</code></pre></li>
-</ul>
-<p>总结为：在树中，对于任何一个有左子树的结点，会 2 次回到自己；没有左子树的结点，只会 1 次回到自己，整体顺序为：先回到当前结点，遍历完自己的左子树之后，再回到 cur,在遍历右子树</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morris</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           <span class="token keyword">return</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
-       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
-       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left <span class="token punctuation">;</span>
-           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
-                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
-               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-                  cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span> 
-               <span class="token punctuation">}</span>
-           <span class="token punctuation">}</span>
-           cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span></code></pre>
-<h3 id="Morris实现先序遍历"><a href="#Morris实现先序遍历" class="headerlink" title="Morris实现先序遍历"></a>Morris实现先序遍历</h3><p>在Morris的基础上，只要第一次回到当前结点，即 当前结点左子树最右结点的右孩子为 null ;或者当前结点没有左子树</p>
-<p>就直接打印，从而实现先序遍历</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisPre</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           <span class="token keyword">return</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
-       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
-       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left <span class="token punctuation">;</span>
-           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
-                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
-               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-                  cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span> 
-               <span class="token punctuation">}</span>
-           <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-               System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-           <span class="token punctuation">}</span>
-           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span></code></pre>
-<h3 id="Morris实现中序遍历"><a href="#Morris实现中序遍历" class="headerlink" title="Morris实现中序遍历"></a>Morris实现中序遍历</h3><p>因为中序遍历是：左中右，那么在当前结点没有左子树时，就直接打印；在当前结点有左子树的情况下，第二次回到自己时，打印，实现中序遍历。</p>
-<p>我们知道，不管是没有左子树时，还是第二次回到自己时，下一步都是向右移动，所以，在代码中可以在当前结点 cur1 向右移动时打印结点</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisIn</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           <span class="token keyword">return</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
-       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
-       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-           <span class="token keyword">if</span><span class="token punctuation">(</span> cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
-                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-                   <span class="token keyword">continue</span><span class="token punctuation">;</span>
-               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-           <span class="token punctuation">}</span>
-           System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span></code></pre>
-<h3 id="Morris实现后序遍历"><a href="#Morris实现后序遍历" class="headerlink" title="Morris实现后序遍历"></a>Morris实现后序遍历</h3><p>后序遍历有点复杂，在第 2 次回到当前结点时，把左子树右边界逆序打印完后，当整个循环走完，对于整个树，在单独打印树的右遍历。</p>
-<p>对于逆序，可以借助栈，不过会有额外空间额代价，这里采用 链表逆序法 reverse(head),</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisPos</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span>head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           <span class="token keyword">return</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
-       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
-       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-           cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
-                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
-                   <span class="token keyword">continue</span><span class="token punctuation">;</span>
-               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
-                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span>
-                   <span class="token function">printEdge</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-           <span class="token punctuation">}</span>
-           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-       <span class="token function">printEdge</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-       <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">printEdge</span><span class="token punctuation">(</span>Node left<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-               Node cur <span class="token operator">=</span> <span class="token function">reverse</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
-               <span class="token keyword">while</span><span class="token punctuation">(</span>cur <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                   cur <span class="token operator">=</span> cur<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-               <span class="token punctuation">}</span>
-
-        <span class="token punctuation">}</span>
-        <span class="token keyword">private</span> <span class="token keyword">static</span> Node <span class="token function">reverse</span><span class="token punctuation">(</span>Node cur<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            Node next <span class="token operator">=</span> null<span class="token punctuation">;</span>
-            Node pre <span class="token operator">=</span> null<span class="token punctuation">;</span>
-            <span class="token keyword">while</span><span class="token punctuation">(</span>cur <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                next <span class="token operator">=</span> cur<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
-                cur<span class="token punctuation">.</span>right <span class="token operator">=</span> pre<span class="token punctuation">;</span>
-                pre <span class="token operator">=</span> cur<span class="token punctuation">;</span>
-                cur <span class="token operator">=</span> next<span class="token punctuation">;</span>
-            <span class="token punctuation">}</span>
-            <span class="token keyword">return</span> pre<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span></code></pre>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/算法/">算法</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/二叉树/">二叉树</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2020/02/11/demo2020-02-11/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          SQL语句是如何执行的?
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/11/08/2019-11-8/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">从JVM层理解Java方法调用</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#引入"><span class="nav-number">1.</span> <span class="nav-text">引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris遍历"><span class="nav-number">2.</span> <span class="nav-text">Morris遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris实现先序遍历"><span class="nav-number">3.</span> <span class="nav-text">Morris实现先序遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris实现中序遍历"><span class="nav-number">4.</span> <span class="nav-text">Morris实现中序遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Morris实现后序遍历"><span class="nav-number">5.</span> <span class="nav-text">Morris实现后序遍历</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

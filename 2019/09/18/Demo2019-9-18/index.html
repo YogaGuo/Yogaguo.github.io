@@ -1,525 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Cookie会话技术的学习笔记 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Cookie">
-  
-  
-  
-  
-  <meta name="description" content="会话技术 1.会话： 一次会话中包含多次请求和响应。     1.一次会话: 浏览器第一次给服务器资源发送请求，会话建立，访问服务器，直到有一方断开为止。  作用：在一次会话的范围内的多次请求间共享数据(HTTP是无状态的，每一次建立的请求和响应都是独立的，即不和其他请求响应进行交互，会话技术则解决了此问题)    方式：    1.客户端会话技术：Cookie    2.服务器端会话技术：Ses">
-<meta name="keywords" content="Cookie">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Cookie会话技术的学习笔记">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/09/18/Demo2019-9-18/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="会话技术 1.会话： 一次会话中包含多次请求和响应。     1.一次会话: 浏览器第一次给服务器资源发送请求，会话建立，访问服务器，直到有一方断开为止。  作用：在一次会话的范围内的多次请求间共享数据(HTTP是无状态的，每一次建立的请求和响应都是独立的，即不和其他请求响应进行交互，会话技术则解决了此问题)    方式：    1.客户端会话技术：Cookie    2.服务器端会话技术：Ses">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/18/Demo2019-9-18/cookie.png">
-<meta property="og:updated_time" content="2020-05-31T12:12:33.205Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Cookie会话技术的学习笔记">
-<meta name="twitter:description" content="会话技术 1.会话： 一次会话中包含多次请求和响应。     1.一次会话: 浏览器第一次给服务器资源发送请求，会话建立，访问服务器，直到有一方断开为止。  作用：在一次会话的范围内的多次请求间共享数据(HTTP是无状态的，每一次建立的请求和响应都是独立的，即不和其他请求响应进行交互，会话技术则解决了此问题)    方式：    1.客户端会话技术：Cookie    2.服务器端会话技术：Ses">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/09/18/Demo2019-9-18/cookie.png">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-Demo2019-9-18" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Cookie会话技术的学习笔记
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/09/18/Demo2019-9-18/" class="article-date">
-	  <time datetime="2019-09-18T08:41:58.000Z" itemprop="datePublished">九月 18, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="会话技术"><a href="#会话技术" class="headerlink" title="会话技术"></a>会话技术</h3><ul>
-<li><p>1.会话： <strong>一次会话</strong>中包含多次请求和响应。   </p>
-<ul>
-<li><p>1.一次会话: 浏览器第一次给服务器资源发送请求，会话建立，访问服务器，直到有一方断开为止。</p>
-</li>
-<li><p>作用：<strong>在一次会话的范围内的多次请求间共享数据</strong>(HTTP是无状态的，每一次建立的请求和响应都是独立的，即不和其他请求响应进行交互，会话技术则解决了此问题)  </p>
-</li>
-<li><p>方式：  </p>
-<ul>
-<li><p>1.客户端会话技术：Cookie  </p>
-</li>
-<li><p>2.服务器端会话技术：Session </p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie:"></a>Cookie:</h3></li>
-<li><ol>
-<li>概念：客户端会话技术，将数据保存到客户端  </li>
-</ol>
-</li>
-</ul>
-<h4 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h4><ul>
-<li><p>1.使用步骤：  </p>
-<ul>
-<li><p>1.创建Cookie对象，绑定数据 </p>
-<p><code>new Cookie(String name,String value)</code></p>
-</li>
-<li><p>2.客户端发送Cookie对象 给浏览器 </p>
-<p><code>response.addCookie(Cookie cookie)</code></p>
-</li>
-<li><p>3.获取Cookie，服务器拿到数据</p>
-<p><code>Cookie[] request.getCookie()</code></p>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="Cookie实现原理"><a href="#Cookie实现原理" class="headerlink" title="Cookie实现原理"></a>Cookie实现原理</h4><p>基于响应头set-cookie和请求头cookie实现</p>
-<img src="/2019/09/18/Demo2019-9-18/cookie.png">
-
-<h4 id="Cookie的细节"><a href="#Cookie的细节" class="headerlink" title="Cookie的细节"></a>Cookie的细节</h4><ul>
-<li>1.一次可不可以发送多个cookie?</li>
-<li>可以，创建多个Cookie对象，发送多个键值对的数据</li>
-</ul>
-<h5 id="cookie在浏览器保存多长时间？"><a href="#cookie在浏览器保存多长时间？" class="headerlink" title="cookie在浏览器保存多长时间？"></a>cookie在浏览器保存多长时间？</h5><ul>
-<li><p>1.默认情况下，当浏览器被关闭，Cookie数据被销毁（默认情况：Cookie存于浏览器内存）</p>
-</li>
-<li><p>2.设置Cookie生命周期，让它持久化存储：</p>
-<p><code>setMaxAge(int seconds)</code></p>
-<ul>
-<li>1.正数：将Cookie数据写到硬盘中，持久化存储，也代表Cookie的存活时间</li>
-<li>2.负数（默认值）</li>
-<li>3.零：代表删除Cookie信息</li>
-</ul>
-</li>
-</ul>
-<h5 id="cookie可以存中文？"><a href="#cookie可以存中文？" class="headerlink" title="cookie可以存中文？"></a>cookie可以存中文？</h5><ul>
-<li>在Tomcat 8 之前，Cookie不能直接存储中文数据</li>
-<li>在Tomcat 8 之后，支持中文,但是，对于一些特殊字符还是不支持，用URL编码存储，URL解码</li>
-</ul>
-<h5 id="cookie获取范围有多大？"><a href="#cookie获取范围有多大？" class="headerlink" title="cookie获取范围有多大？"></a>cookie获取范围有多大？</h5><ul>
-<li><p>假设在一个Tmocat服务器中，部署了多个web项目，这些web项目中cookie能不能共享</p>
-<ul>
-<li><p><strong>默认情况下，cookie不能共享</strong></p>
-</li>
-<li><p><code>setPath(String path)  //设置cookie的获取范围，默认下，设置当前的虚拟目录</code></p>
-</li>
-<li><p>如果要共享</p>
-<p><code>setPath(&quot;/&quot;)</code></p>
-</li>
-</ul>
-</li>
-</ul>
-<h5 id="不同的tomcat服务器间cookie的共享问题："><a href="#不同的tomcat服务器间cookie的共享问题：" class="headerlink" title="不同的tomcat服务器间cookie的共享问题："></a>不同的tomcat服务器间cookie的共享问题：</h5><p><code>setDomain(String path)</code> </p>
-<p>如果设置<strong>一级域名</strong>相同，那么多个服务器之间cookie共享</p>
-<p><code>setDomain(&quot;.baidu.com&quot;)</code>,那么，tieba.baidu.com和news.baidu.com中的cookie就可以共享</p>
-<h4 id="Cookie的特点和作用"><a href="#Cookie的特点和作用" class="headerlink" title="Cookie的特点和作用"></a>Cookie的特点和作用</h4><h5 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h5><ul>
-<li><p>1.Cookie存储数据在客户端浏览器</p>
-</li>
-<li><p>2.浏览器对单个cookie的大小有限制，以及，对同一个域名下的总cookie数量也有限制(20个)</p>
-</li>
-</ul>
-<h5 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h5><ul>
-<li><ol>
-<li>cookie一般用于存储少量不太敏感的数据</li>
-<li><strong>在不登录的情况下，来完成服务器对客户端的身份识别</strong></li>
-</ol>
-</li>
-</ul>
-<h3 id="Cookie小案例：记住上一次访问的时间"><a href="#Cookie小案例：记住上一次访问的时间" class="headerlink" title="Cookie小案例：记住上一次访问的时间"></a>Cookie小案例：记住上一次访问的时间</h3><ul>
-<li><p>1.访问一个Servlet,如果是第一次访问，则提示：您好，欢迎您首次访问。</p>
-</li>
-<li><p>2.如果不是第一次访问，则提示：欢迎回来，您上次访问时间为：显示时间字符串</p>
-</li>
-</ul>
-<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><ul>
-<li><p>1.可以采用Cookie来完成</p>
-</li>
-<li><p>2.在服务器中的Servlet判断是否有一个名为lastTime的cookie</p>
-<ul>
-<li><p>1.有：不是第一次访问，响应数据：（欢迎回来，您上次访问时间为xxxxxx）,在写回Cookie</p>
-</li>
-<li><p>2.没有：是第一次访问，响应数据（您好，欢迎首次访问），再写回Cookie(lastTime=xxxxx)</p>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>Yogaguo<span class="token punctuation">.</span>cookieCase<span class="token punctuation">;</span>
-
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>ServletException<span class="token punctuation">;</span>
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span>WebServlet<span class="token punctuation">;</span>
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>Cookie<span class="token punctuation">;</span>
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServlet<span class="token punctuation">;</span>
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletRequest<span class="token punctuation">;</span>
-<span class="token keyword">import</span> javax<span class="token punctuation">.</span>servlet<span class="token punctuation">.</span>http<span class="token punctuation">.</span>HttpServletResponse<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>io<span class="token punctuation">.</span>IOException<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URLDecoder<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>net<span class="token punctuation">.</span>URLEncoder<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>text<span class="token punctuation">.</span>SimpleDateFormat<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>Date<span class="token punctuation">;</span>
-<span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>SimpleFormatter<span class="token punctuation">;</span>
-
-<span class="token comment" spellcheck="true">/**
- - 2.在服务器中的Servlet判断是否有一个名为lastTime的cookie
-   - 1.有：不是第一次访问，响应数据：（欢迎回来，您上次访问时间为xxxxxx）,在写回Cookie
-   - 2.没有：是第一次访问，响应数据（您好，欢迎首次访问），再写回Cookie(lastTime=xxxxx)
- */</span>
-<span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/cookieTest"</span><span class="token punctuation">)</span>
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CookieTest</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
-    <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
-        <span class="token keyword">boolean</span> flag <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//设置响应的消息体的数据格式和编码</span>
-        resp<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//获取所有的cookie</span>
-        Cookie<span class="token punctuation">[</span><span class="token punctuation">]</span> cookies <span class="token operator">=</span> req<span class="token punctuation">.</span><span class="token function">getCookies</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//遍历cookies数组</span>
-        <span class="token keyword">if</span><span class="token punctuation">(</span>cookies <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cookies<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-            <span class="token keyword">for</span><span class="token punctuation">(</span>Cookie c <span class="token operator">:</span>cookies<span class="token punctuation">)</span><span class="token punctuation">{</span>
-                <span class="token comment" spellcheck="true">//获取cookie的名称</span>
-                String name <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token comment" spellcheck="true">//判断是否有lastTime</span>
-                <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token string">"lastTime"</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-                    flag <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-                    <span class="token comment" spellcheck="true">//获取当前时间的字符串，重新设置cookie的值，再重新发送cookie</span>
-                    Date date <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    SimpleDateFormat simpleDateFormat <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleDateFormat</span><span class="token punctuation">(</span><span class="token string">"yyyy年MM月dd日 HH:mm:ss"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    String str <span class="token operator">=</span> simpleDateFormat<span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>date<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    str <span class="token operator">=</span> URLEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>str<span class="token punctuation">,</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token comment" spellcheck="true">//响应数据</span>
-                    String value <span class="token operator">=</span> c<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token comment" spellcheck="true">//URL解码</span>
-                    value <span class="token operator">=</span> URLDecoder<span class="token punctuation">.</span><span class="token function">decode</span><span class="token punctuation">(</span>value<span class="token punctuation">,</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    resp<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"&lt;h1>欢迎回来，您上次访问时间为:"</span><span class="token operator">+</span>value<span class="token operator">+</span><span class="token string">"&lt;/h1>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    c<span class="token punctuation">.</span><span class="token function">setValue</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token comment" spellcheck="true">//设置cookie的存活时间 一个月</span>
-                    c<span class="token punctuation">.</span><span class="token function">setMaxAge</span><span class="token punctuation">(</span><span class="token number">60</span><span class="token operator">*</span><span class="token number">60</span><span class="token operator">*</span><span class="token number">24</span><span class="token operator">*</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    resp<span class="token punctuation">.</span><span class="token function">addCookie</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                    <span class="token keyword">break</span><span class="token punctuation">;</span>
-                <span class="token punctuation">}</span>
-            <span class="token punctuation">}</span>
-        <span class="token punctuation">}</span>
-
-        <span class="token keyword">if</span><span class="token punctuation">(</span>cookies <span class="token operator">==</span> null <span class="token operator">||</span> cookies<span class="token punctuation">.</span>length <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">||</span> flag <span class="token operator">==</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
-            Date date <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            SimpleDateFormat simpleDateFormat <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SimpleDateFormat</span><span class="token punctuation">(</span><span class="token string">"yyyy年MM月dd日 HH:mm:ss"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            String str <span class="token operator">=</span> simpleDateFormat<span class="token punctuation">.</span><span class="token function">format</span><span class="token punctuation">(</span>date<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            str <span class="token operator">=</span> URLEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>str<span class="token punctuation">,</span><span class="token string">"utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            Cookie cookie <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Cookie</span><span class="token punctuation">(</span><span class="token string">"lastTime"</span><span class="token punctuation">,</span><span class="token string">"str"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            cookie<span class="token punctuation">.</span><span class="token function">setMaxAge</span><span class="token punctuation">(</span><span class="token number">3600</span><span class="token operator">*</span><span class="token number">24</span><span class="token operator">*</span><span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            resp<span class="token punctuation">.</span><span class="token function">addCookie</span><span class="token punctuation">(</span>cookie<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            resp<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span><span class="token string">"&lt;h1>您好，欢迎您首次访问"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-
-    <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest req<span class="token punctuation">,</span> HttpServletResponse resp<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
-         <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doGet</span><span class="token punctuation">(</span>req<span class="token punctuation">,</span>resp<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p>​    </p>
-<p>​        </p>
-<p>​      </p>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Cookie/">Cookie</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/09/21/Demo2019-9-21/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          JSP与Session初学
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/09/17/Demo2019-9-17/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">一个空格引发的bug</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#会话技术"><span class="nav-number">1.</span> <span class="nav-text">会话技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie"><span class="nav-number">2.</span> <span class="nav-text">Cookie:</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#快速入门"><span class="nav-number">2.1.</span> <span class="nav-text">快速入门</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cookie实现原理"><span class="nav-number">2.2.</span> <span class="nav-text">Cookie实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cookie的细节"><span class="nav-number">2.3.</span> <span class="nav-text">Cookie的细节</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#cookie在浏览器保存多长时间？"><span class="nav-number">2.3.1.</span> <span class="nav-text">cookie在浏览器保存多长时间？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cookie可以存中文？"><span class="nav-number">2.3.2.</span> <span class="nav-text">cookie可以存中文？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#cookie获取范围有多大？"><span class="nav-number">2.3.3.</span> <span class="nav-text">cookie获取范围有多大？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#不同的tomcat服务器间cookie的共享问题："><span class="nav-number">2.3.4.</span> <span class="nav-text">不同的tomcat服务器间cookie的共享问题：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cookie的特点和作用"><span class="nav-number">2.4.</span> <span class="nav-text">Cookie的特点和作用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#特点"><span class="nav-number">2.4.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#作用"><span class="nav-number">2.4.2.</span> <span class="nav-text">作用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie小案例：记住上一次访问的时间"><span class="nav-number">3.</span> <span class="nav-text">Cookie小案例：记住上一次访问的时间</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分析"><span class="nav-number">3.1.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码"><span class="nav-number">3.2.</span> <span class="nav-text">代码</span></a></li></ol></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

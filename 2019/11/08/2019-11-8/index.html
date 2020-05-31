@@ -1,470 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>从JVM层理解Java方法调用 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Java">
-  
-  
-  
-  
-  <meta name="description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。 在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。 在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的">
-<meta name="keywords" content="Java">
-<meta property="og:type" content="article">
-<meta property="og:title" content="从JVM层理解Java方法调用">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/11/08/2019-11-8/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。 在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。 在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-31T12:10:13.833Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="从JVM层理解Java方法调用">
-<meta name="twitter:description" content="解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。 在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。 在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-11-8" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      从JVM层理解Java方法调用
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/11/08/2019-11-8/" class="article-date">
-	  <time datetime="2019-11-08T11:22:32.000Z" itemprop="datePublished">十一月 8, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p>
-<p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p>
-<p>在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用称为 <strong>解析</strong>。满足这种要求（编译期可知，运行期不可知）的方法包括：静态方法（与类型有关，在初始化阶段就已确定） 私有方法（外部类不可访问），它们的性质就决定了不可能通过继承什么的重写。</p>
-<p>在JVM中，只要能被<strong>invokestatic</strong>和<strong>invokespecial</strong>指令调用的方法，都满足上述（在解析阶段唯一确定），符合条件的方法：静态方法 私有方法  实例构造器  父类方法。它们 在类加载阶段，会将符号引用解析为该方法的直接引用。</p>
-<h2 id="静态分配"><a href="#静态分配" class="headerlink" title="静态分配"></a>静态分配</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
-
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StaticDisPatch</span> <span class="token punctuation">{</span>
-     <span class="token keyword">static</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-
-    <span class="token punctuation">}</span>
-     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Man</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-
-    <span class="token punctuation">}</span>
-    <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Women</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-
-    <span class="token punctuation">}</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Human guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello guy"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Man guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello man"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Women guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello women"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        Human man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Man</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        Human women <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        StaticDisPatch sr <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StaticDisPatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        sr<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span>man<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        sr<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span>women<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p>运行结果：</p>
-<pre class=" language-java"><code class="language-java">hello guy
-hello guy
-</code></pre>
-<p>在上述代码中，把 “Human” 称为 静态类型，后面的 “Man” 称为实际类型，静态类型的变化只在使用时发生，变量本身不发生改变，最终的静态类型是在编译期确定的；而实际类型的变化结果在运行期才可知。编译期在编译程序时并不知道一个对象的实际类型。</p>
-<p>在上述代码中，两次调用 sayHello（）方法，使用哪个重载版本，就完全取决与传入的参数的类型 数量（签名），JVM（或者说编译器）<strong>在重载时是通过参数的静态类型</strong>而不是实际类型作为判定依据的。静态类型在编译期就可以确定。</p>
-<p><strong>总结：在编译期间，Javac编译期会根据参数的静态类型决定使用哪个版本，所有依赖静态类型来定位方法的执行版本的分派动作称为静态分派，典型的就是重载</strong>。</p>
-<h2 id="动态分派—多态与重写"><a href="#动态分派—多态与重写" class="headerlink" title="动态分派—多态与重写"></a>动态分派—多态与重写</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
-
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DynamicDisPatch</span> <span class="token punctuation">{</span>
-     <span class="token keyword">static</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-         <span class="token keyword">protected</span> <span class="token keyword">abstract</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-     <span class="token punctuation">}</span>
-     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Man</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-         <span class="token annotation punctuation">@Override</span>
-        <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-             System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"man say Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token punctuation">}</span>
-     <span class="token punctuation">}</span>
-     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Women</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
-       <span class="token annotation punctuation">@Override</span>
-              <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"women say Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-              <span class="token punctuation">}</span>        
-     <span class="token punctuation">}</span>
-     <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        Human man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Man</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        Human women <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        man<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        women<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        man<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p>运行结果：</p>
-<pre><code>man say Hello
-women say Hello
-women say Hello
-</code></pre><p>显然，这里不能用静态类型解释，其实造成此结果的愿意：这两个变量的实际类型不同。如果进行反编译，会发现两条 invokespecial 指令，但是两条指令的最终执行目标却不一样，这就要从 invokespecial 指令的运行时的查找过程说起：</p>
-<p>首先：</p>
-<ul>
-<li><p>找到操作数栈顶的第一个元素所指向的对象的实际类型，标记为 A </p>
-</li>
-<li><p>在 类型 A 中找与常量池中的描述符和简单名称相符的方法，找到进行权限访问，通过则返回此方法的直接引用，不通过，抛异常 IIegalAccessError</p>
-</li>
-<li><p>找不到，按继承关系从下往上找。</p>
-</li>
-</ul>
-<p><strong>由于 invokespecial 指令执行的第一步就是在运行期间确定接受者的实际类型</strong>，<strong>所以两次调用中的 invokespecial 指令都是把常量池的类方法符号引用解析到不同的直接引用上</strong>，<strong>这就是 重写的本质</strong>。</p>
-<h2 id="单分配与多分配"><a href="#单分配与多分配" class="headerlink" title="单分配与多分配"></a>单分配与多分配</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
-
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DisPatch</span> <span class="token punctuation">{</span>
-  <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">QQ</span><span class="token punctuation">{</span>
-
-  <span class="token punctuation">}</span>
-  <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Weixin</span><span class="token punctuation">{</span>
-
-  <span class="token punctuation">}</span>
-  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Father</span><span class="token punctuation">{</span>
-      <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>QQ qq<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"father choose qq"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">}</span>
-      <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>Weixin wechat<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"father choose wechat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span>
-  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Son</span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token punctuation">{</span>
-      <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>QQ qq<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
-         System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"son choose qq"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-      <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>Weixin wechat<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
-         System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"son choose wechat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span>
-  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    Father father <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Father</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    Father son <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Son</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    father<span class="token punctuation">.</span><span class="token function">choose</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Weixin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    son<span class="token punctuation">.</span><span class="token function">choose</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">QQ</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p>运行结果：</p>
-<pre><code>father choose wechat
-son choose qq
-</code></pre><p>分析：</p>
-<p>​     在编译阶段，由静态分配可知：产生的两条 invokespecial 指令的参数分别为常量池中的 Father.choose(weichat)和Father.choose(qq)方法的符号引用。</p>
-<p>​    在运行时，也就是动态分配时，在执行<code>son.choose(new QQ())</code>,所对应的 invokespecial 指令时，编译期已经确定了目标方法的签名必须为 choose(QQ),JVM此时不关心传递过来的参数的类型，唯一可以影响JVM的因素就是：此方法接受的实际类型是Father还是Son </p>
-<h2 id="方法表"><a href="#方法表" class="headerlink" title="方法表"></a>方法表</h2><p>由于动态分配是非常频繁的动作，基于JVM性能的考虑，常用的“优化手段”——在方法区建立一个<strong>虚方法表</strong>，表中存放着各个方法的实际入口地址。如果某个方法在子类中没有重写，那么子类的虚方法表的地址入口和父类相同方法的入口地址是一致的。都指向父类的实现入口，如果重写了，子类方法表中的地址将会指向子类实现版本的入口。</p>
-<p>为了程序实现上的方便，具有相同签名的方法，在父类，子类的虚方法表中都应当具有一样的索引，这样当类型变化时，只需要变更查找的方法表。</p>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Java基础/">Java基础</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/11/19/2019-11-19/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          Morris遍历实现二叉树的三种遍历
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/11/03/2019-11-03/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">一致性哈希算法的原理</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解析"><span class="nav-number">1.</span> <span class="nav-text">解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态分配"><span class="nav-number">2.</span> <span class="nav-text">静态分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态分派—多态与重写"><span class="nav-number">3.</span> <span class="nav-text">动态分派—多态与重写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单分配与多分配"><span class="nav-number">4.</span> <span class="nav-text">单分配与多分配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法表"><span class="nav-number">5.</span> <span class="nav-text">方法表</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

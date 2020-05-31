@@ -1,551 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Response对象的学习及案例 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Servlet">
-  
-  
-  
-  
-  <meta name="description" content="1. HTTP协议：响应消息 2. Response对象 3. ServletContext对象HTTP协议：1. 请求消息：客户端发送给服务器端的数据     * 数据格式：         1. 请求行         2. 请求头         3. 请求空行         4. 请求体 2. 响应消息：服务器端发送给客户端的数据     * 数据格式：         1. 响应行">
-<meta name="keywords" content="Servlet">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Response对象的学习及案例">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/09/17/demo7/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="1. HTTP协议：响应消息 2. Response对象 3. ServletContext对象HTTP协议：1. 请求消息：客户端发送给服务器端的数据     * 数据格式：         1. 请求行         2. 请求头         3. 请求空行         4. 请求体 2. 响应消息：服务器端发送给客户端的数据     * 数据格式：         1. 响应行">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-31T12:09:41.524Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Response对象的学习及案例">
-<meta name="twitter:description" content="1. HTTP协议：响应消息 2. Response对象 3. ServletContext对象HTTP协议：1. 请求消息：客户端发送给服务器端的数据     * 数据格式：         1. 请求行         2. 请求头         3. 请求空行         4. 请求体 2. 响应消息：服务器端发送给客户端的数据     * 数据格式：         1. 响应行">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-demo7" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Response对象的学习及案例
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/09/17/demo7/" class="article-date">
-	  <time datetime="2019-09-17T10:41:42.000Z" itemprop="datePublished">九月 17, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <pre><code>1. HTTP协议：响应消息
-2. Response对象
-3. ServletContext对象</code></pre><h2 id="HTTP协议："><a href="#HTTP协议：" class="headerlink" title="HTTP协议："></a>HTTP协议：</h2><pre><code>1. 请求消息：客户端发送给服务器端的数据
-    * 数据格式：
-        1. 请求行
-        2. 请求头
-        3. 请求空行
-        4. 请求体
-2. 响应消息：服务器端发送给客户端的数据
-    * 数据格式：
-        1. 响应行
-            1. 组成：协议/版本 响应状态码 状态码描述
-            2. 响应状态码：服务器告诉客户端浏览器本次请求和响应的一个状态。
-                1. 状态码都是3位数字 
-                2. 分类：
-                    1. 1xx：服务器就收客户端消息，但没有接受完成，等待一段时间后，发送1xx多状态码
-                    2. 2xx：成功。代表：200
-                    3. 3xx：重定向。代表：302(重定向)，304(访问缓存)
-                    4. 4xx：客户端错误。
-                        * 代表：
-                            * 404（请求路径没有对应的资源） 
-                            * 405：请求方式没有对应的doXxx方法
-                    5. 5xx：服务器端错误。代表：500(服务器内部出现异常)</code></pre><p>​<br>​            2. 响应头：<br>​                1. 格式：头名称： 值<br>​                2. 常见的响应头：<br>​                    1. Content-Type：服务器告诉客户端本次响应体数据格式以及编码格式<br>​                    2. Content-disposition：服务器告诉客户端以什么格式打开响应体数据<br>​                        * 值：<br>​                            * in-line:默认值,在当前页面内打开<br>​                            * attachment;filename=xxx：以附件形式打开响应体。文件下载<br>​            3. 响应空行<br>​            4. 响应体:传输的数据</p>
-<pre class=" language-html"><code class="language-html">    * 响应字符串格式
-        HTTP/1.1 200 OK
-        Content-Type: text/html;charset=UTF-8
-        Content-Length: 101
-        Date: Wed, 06 Jun 2018 07:08:42 GMT
-
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
-          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>$Title$<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
-          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
-          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
-          hello , response
-          <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
-<h2 id="Response对象"><a href="#Response对象" class="headerlink" title="Response对象"></a>Response对象</h2><pre class=" language-java"><code class="language-java"><span class="token operator">*</span> 功能：设置响应消息
-    <span class="token number">1</span><span class="token punctuation">.</span> 设置响应行
-        <span class="token number">1</span><span class="token punctuation">.</span> 格式：HTTP<span class="token operator">/</span><span class="token number">1.1</span> <span class="token number">200</span> ok
-        <span class="token number">2</span><span class="token punctuation">.</span> 设置状态码：<span class="token function">setStatus</span><span class="token punctuation">(</span><span class="token keyword">int</span> sc<span class="token punctuation">)</span> 
-    <span class="token number">2</span><span class="token punctuation">.</span> 设置响应头：<span class="token function">setHeader</span><span class="token punctuation">(</span>String name<span class="token punctuation">,</span> String value<span class="token punctuation">)</span> 
-
-    <span class="token number">3</span><span class="token punctuation">.</span> 设置响应体：
-        <span class="token operator">*</span> 使用步骤：
-            <span class="token number">1</span><span class="token punctuation">.</span> 获取输出流
-                <span class="token operator">*</span> 字符输出流：PrintWriter <span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-
-                <span class="token operator">*</span> 字节输出流：ServletOutputStream <span class="token function">getOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-
-            <span class="token number">2</span><span class="token punctuation">.</span> 使用输出流，将数据输出到客户端浏览器</code></pre>
-<pre><code>* 案例：
-    1. 完成重定向
-        * 重定向：资源跳转的方式
-        * 代码实现：
-            //1. 设置状态码为302
-            response.setStatus(302);
-            //2.设置响应头location
-            response.setHeader(&quot;location&quot;,&quot;/day15/responseDemo2&quot;);</code></pre><pre class=" language-java"><code class="language-java">            <span class="token comment" spellcheck="true">//简单的重定向方法</span>
-            response<span class="token punctuation">.</span><span class="token function">sendRedirect</span><span class="token punctuation">(</span><span class="token string">"/day15/responseDemo2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token operator">*</span> 重定向的特点<span class="token operator">:</span>redirect
-            <span class="token number">1</span><span class="token punctuation">.</span> 地址栏发生变化
-            <span class="token number">2</span><span class="token punctuation">.</span> 重定向可以访问其他站点<span class="token punctuation">(</span>服务器<span class="token punctuation">)</span>的资源
-            <span class="token number">3</span><span class="token punctuation">.</span> 重定向是两次请求。不能使用request对象来共享数据
-        <span class="token operator">*</span> 转发的特点：forward
-            <span class="token number">1</span><span class="token punctuation">.</span> 转发地址栏路径不变
-            <span class="token number">2</span><span class="token punctuation">.</span> 转发只能访问当前服务器下的资源
-            <span class="token number">3</span><span class="token punctuation">.</span> 转发是一次请求，可以使用request对象来共享数据
-
-        <span class="token operator">*</span> forward 和  redirect 区别
-
-        <span class="token operator">*</span> 路径写法：
-            <span class="token number">1</span><span class="token punctuation">.</span> 路径分类
-                <span class="token number">1</span><span class="token punctuation">.</span> 相对路径：通过相对路径不可以确定唯一资源
-                    <span class="token operator">*</span> 如：<span class="token punctuation">.</span>/index<span class="token punctuation">.</span>html
-                    <span class="token operator">*</span> 不以<span class="token operator">/</span>开头，以<span class="token punctuation">.</span>开头路径
-
-                    <span class="token operator">*</span> 规则：找到当前资源和目标资源之间的相对位置关系
-                        <span class="token operator">*</span> <span class="token punctuation">.</span>/：当前目录
-                        <span class="token operator">*</span> <span class="token punctuation">.</span><span class="token punctuation">.</span>/<span class="token operator">:</span>后退一级目录
-                <span class="token number">2</span><span class="token punctuation">.</span> 绝对路径：通过绝对路径可以确定唯一资源
-                    <span class="token operator">*</span> 如：http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>localhost<span class="token operator">/</span>day15<span class="token operator">/</span>responseDemo2        <span class="token operator">/</span>day15<span class="token operator">/</span>responseDemo2
-                    <span class="token operator">*</span> 以<span class="token operator">/</span>开头的路径
-
-                    <span class="token operator">*</span> 规则：判断定义的路径是给谁用的？判断请求将来从哪儿发出
-                        <span class="token operator">*</span> 给客户端浏览器使用：需要加虚拟目录<span class="token punctuation">(</span>项目的访问路径<span class="token punctuation">)</span>
-                            <span class="token operator">*</span> 建议虚拟目录动态获取：request<span class="token punctuation">.</span><span class="token function">getContextPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-                            <span class="token operator">*</span> <span class="token operator">&lt;</span>a<span class="token operator">></span> <span class="token punctuation">,</span> <span class="token operator">&lt;</span>form<span class="token operator">></span> 重定向<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-                        <span class="token operator">*</span> 给服务器使用：不需要加虚拟目录
-                            <span class="token operator">*</span> 转发路径</code></pre>
-<p>​<br>​                        </p>
-<pre class=" language-java"><code class="language-java">    <span class="token number">2</span><span class="token punctuation">.</span> 服务器输出字符数据到浏览器
-        <span class="token operator">*</span> 步骤：
-            <span class="token number">1</span><span class="token punctuation">.</span> 获取字符输出流
-            <span class="token number">2</span><span class="token punctuation">.</span> 输出数据
-
-        <span class="token operator">*</span> 注意：
-            <span class="token operator">*</span> 乱码问题：
-                <span class="token number">1</span><span class="token punctuation">.</span> PrintWriter pw <span class="token operator">=</span> response<span class="token punctuation">.</span><span class="token function">getWriter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>获取的流的默认编码是ISO<span class="token operator">-</span><span class="token number">8859</span><span class="token operator">-</span><span class="token number">1</span>
-                <span class="token number">2</span><span class="token punctuation">.</span> 设置该流的默认编码
-                <span class="token number">3</span><span class="token punctuation">.</span> 告诉浏览器响应体使用的编码
-
-                <span class="token comment" spellcheck="true">//简单的形式，设置编码，是在获取流之前设置</span>
-                response<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"text/html;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token number">3</span><span class="token punctuation">.</span> 服务器输出字节数据到浏览器
-        <span class="token operator">*</span> 步骤：
-            <span class="token number">1</span><span class="token punctuation">.</span> 获取字节输出流
-            <span class="token number">2</span><span class="token punctuation">.</span> 输出数据
-
-    <span class="token number">4</span><span class="token punctuation">.</span> 验证码
-        <span class="token number">1</span><span class="token punctuation">.</span> 本质：图片
-        <span class="token number">2</span><span class="token punctuation">.</span> 目的：防止恶意表单注册</code></pre>
-<h2 id="ServletContext对象："><a href="#ServletContext对象：" class="headerlink" title="ServletContext对象："></a>ServletContext对象：</h2><pre class=" language-java"><code class="language-java"><span class="token number">1</span><span class="token punctuation">.</span> 概念：代表整个web应用，可以和程序的容器<span class="token punctuation">(</span>服务器<span class="token punctuation">)</span>来通信
-<span class="token number">2</span><span class="token punctuation">.</span> 获取：
-    <span class="token number">1</span><span class="token punctuation">.</span> 通过request对象获取
-        request<span class="token punctuation">.</span><span class="token function">getServletContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token number">2</span><span class="token punctuation">.</span> 通过HttpServlet获取
-        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getServletContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token number">3</span><span class="token punctuation">.</span> 功能：
-    <span class="token number">1</span><span class="token punctuation">.</span> 获取MIME类型：
-        <span class="token operator">*</span> MIME类型<span class="token operator">:</span>在互联网通信过程中定义的一种文件数据类型
-            <span class="token operator">*</span> 格式： 大类型<span class="token operator">/</span>小类型   text<span class="token operator">/</span>html        image<span class="token operator">/</span>jpeg
-
-        <span class="token operator">*</span> 获取：String <span class="token function">getMimeType</span><span class="token punctuation">(</span>String file<span class="token punctuation">)</span>  
-    <span class="token number">2</span><span class="token punctuation">.</span> 域对象：共享数据
-        <span class="token number">1</span><span class="token punctuation">.</span> <span class="token function">setAttribute</span><span class="token punctuation">(</span>String name<span class="token punctuation">,</span>Object value<span class="token punctuation">)</span>
-        <span class="token number">2</span><span class="token punctuation">.</span> <span class="token function">getAttribute</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span>
-        <span class="token number">3</span><span class="token punctuation">.</span> <span class="token function">removeAttribute</span><span class="token punctuation">(</span>String name<span class="token punctuation">)</span>
-
-        <span class="token operator">*</span> ServletContext对象范围：所有用户所有请求的数据
-    <span class="token number">3</span><span class="token punctuation">.</span> 获取文件的真实<span class="token punctuation">(</span>服务器<span class="token punctuation">)</span>路径
-        <span class="token number">1</span><span class="token punctuation">.</span> 方法：String <span class="token function">getRealPath</span><span class="token punctuation">(</span>String path<span class="token punctuation">)</span>  
-             String b <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getRealPath</span><span class="token punctuation">(</span><span class="token string">"/b.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//web目录下资源访问</span>
-             System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-            String c <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getRealPath</span><span class="token punctuation">(</span><span class="token string">"/WEB-INF/c.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//WEB-INF目录下的资源访问</span>
-            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-            String a <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getRealPath</span><span class="token punctuation">(</span><span class="token string">"/WEB-INF/classes/a.txt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//src目录下的资源访问</span>
-            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-<h2 id="案例："><a href="#案例：" class="headerlink" title="案例："></a>案例：</h2><pre class=" language-javascript"><code class="language-javascript"><span class="token operator">*</span> 文件下载需求：
-    <span class="token number">1</span><span class="token punctuation">.</span> 页面显示超链接
-    <span class="token number">2</span><span class="token punctuation">.</span> 点击超链接后弹出下载提示框
-    <span class="token number">3</span><span class="token punctuation">.</span> 完成图片文件下载</code></pre>
-<pre><code>* 分析：
-    1. 超链接指向的资源如果能够被浏览器解析，则在浏览器中展示，如果不能解析，则弹出下载提示框。不满足需求
-    2. 任何资源都必须弹出下载提示框
-    3. 使用响应头设置资源的打开方式：
-        * content-disposition:attachment;filename=xxx</code></pre><pre class=" language-java"><code class="language-java"><span class="token operator">*</span> 步骤：
-    <span class="token number">1</span><span class="token punctuation">.</span> 定义页面，编辑超链接href属性，指向Servlet，传递资源名称filename
-    <span class="token number">2</span><span class="token punctuation">.</span> 定义Servlet
-        <span class="token number">1</span><span class="token punctuation">.</span> 获取文件名称
-        <span class="token number">2</span><span class="token punctuation">.</span> 使用字节输入流加载文件进内存
-        <span class="token number">3</span><span class="token punctuation">.</span> 指定response的响应头： content<span class="token operator">-</span>disposition<span class="token operator">:</span>attachment<span class="token punctuation">;</span>filename<span class="token operator">=</span>xxx
-        <span class="token number">4</span><span class="token punctuation">.</span> 将数据写出到response输出流</code></pre>
-<pre><code>* 问题：
-    * 中文文件问题
-        * 解决思路：
-            1. 获取客户端使用的浏览器版本信息
-            2. 根据不同的版本信息，设置filename的编码方式不同  </code></pre><pre class=" language-html"><code class="language-html"><span class="token doctype">&lt;!DOCTYPE html></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>Title<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/day14_test/imgs/1.avi<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>视频<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/day14_test/imgs/1.jpg<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>图片<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>hr</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/day14_test/downLoadServlet?filename <span class="token punctuation">=</span> 1.avi<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>视频<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>/day14_test/downLoadServlet?filename <span class="token punctuation">=</span> 1.jpg<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>图片<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
-
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span>   </code></pre>
-<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"all"</span><span class="token punctuation">)</span>
-<span class="token annotation punctuation">@WebServlet</span><span class="token punctuation">(</span><span class="token string">"/downLoadServlet"</span><span class="token punctuation">)</span>
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">downLoadServlet</span> <span class="token keyword">extends</span> <span class="token class-name">HttpServlet</span> <span class="token punctuation">{</span>
-    <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doPost</span><span class="token punctuation">(</span>HttpServletRequest request<span class="token punctuation">,</span> HttpServletResponse response<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">//1.获取请求参数，文件名称</span>
-        String filename <span class="token operator">=</span> request<span class="token punctuation">.</span><span class="token function">getParameter</span><span class="token punctuation">(</span><span class="token string">"filename"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//2.使用字节输入流加载文件进内存</span>
-        <span class="token comment" spellcheck="true">//2.1找到文件服务器路径</span>
-        ServletContext servletContext <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getServletContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        String realPath <span class="token operator">=</span> servletContext<span class="token punctuation">.</span><span class="token function">getRealPath</span><span class="token punctuation">(</span><span class="token string">"/imgs/"</span> <span class="token operator">+</span> filename<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//注意 imgs文件放在web目录下！！！！</span>
-        <span class="token comment" spellcheck="true">//2.2用字节流关联</span>
-        FileInputStream fis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span>realPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-        <span class="token comment" spellcheck="true">//3.设置response的响应头</span>
-        <span class="token comment" spellcheck="true">//3.1设置响应头类型：content-type</span>
-        String mimeType <span class="token operator">=</span> servletContext<span class="token punctuation">.</span><span class="token function">getMimeType</span><span class="token punctuation">(</span>filename<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//获取文件的mime类型</span>
-        response<span class="token punctuation">.</span><span class="token function">setHeader</span><span class="token punctuation">(</span><span class="token string">"content-type"</span><span class="token punctuation">,</span> mimeType<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//3.2设置响应头打开方式:content-disposition</span>
-
-
-        response<span class="token punctuation">.</span><span class="token function">setHeader</span><span class="token punctuation">(</span><span class="token string">"content-disposition"</span><span class="token punctuation">,</span> <span class="token string">"attachment;filename="</span> <span class="token operator">+</span> filename<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//4.将输入流的数据写出到输出流中</span>
-        ServletOutputStream sos <span class="token operator">=</span> response<span class="token punctuation">.</span><span class="token function">getOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> buff <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-        <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">=</span> fis<span class="token punctuation">.</span><span class="token function">read</span><span class="token punctuation">(</span>buff<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            sos<span class="token punctuation">.</span><span class="token function">write</span><span class="token punctuation">(</span>buff<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-
-        fis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token annotation punctuation">@Override</span>
-        <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">doGet</span><span class="token punctuation">(</span>HttpServletRequest request<span class="token punctuation">,</span> HttpServletResponse response<span class="token punctuation">)</span> <span class="token keyword">throws</span> ServletException<span class="token punctuation">,</span> IOException <span class="token punctuation">{</span>
-            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">doPost</span><span class="token punctuation">(</span>request<span class="token punctuation">,</span>response<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>                                                                  </code></pre>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Web/">Web</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Servlet/">Servlet</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/09/17/Demo2019-9-17/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          一个空格引发的bug
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/09/12/Demo5-1/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">数据库连接池技术与Spring Template</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP协议："><span class="nav-number">1.</span> <span class="nav-text">HTTP协议：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Response对象"><span class="nav-number">2.</span> <span class="nav-text">Response对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ServletContext对象："><span class="nav-number">3.</span> <span class="nav-text">ServletContext对象：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例："><span class="nav-number">4.</span> <span class="nav-text">案例：</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

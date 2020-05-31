@@ -1,479 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>JVM内存模型与GC算法策略 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="JVM内存模型GC">
-  
-  
-  
-  
-  <meta name="description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
-<meta name="keywords" content="JVM内存模型,GC">
-<meta property="og:type" content="article">
-<meta property="og:title" content="JVM内存模型与GC算法策略">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/09/29/Demo2019-9-29/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/07.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/08.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/01.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/02.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/03.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/04.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/05.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/06.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/09.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/10.png">
-<meta property="og:updated_time" content="2020-05-31T12:12:02.823Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JVM内存模型与GC算法策略">
-<meta name="twitter:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/07.png">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-Demo2019-9-29" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      JVM内存模型与GC算法策略
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/09/29/Demo2019-9-29/" class="article-date">
-	  <time datetime="2019-09-29T08:09:57.000Z" itemprop="datePublished">九月 29, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/JVM/">JVM</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="JVM-Run-Time-Data-Area-运行时数据区"><a href="#JVM-Run-Time-Data-Area-运行时数据区" class="headerlink" title="JVM Run-Time Data Area 运行时数据区"></a>JVM Run-Time Data Area 运行时数据区</h2><p>在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图</p>
- <img src="/2019/09/29/Demo2019-9-29/07.png">
-
- <img src="/2019/09/29/Demo2019-9-29/08.png">
-
-<h3 id="JVM-Stacks-Java虚拟机栈"><a href="#JVM-Stacks-Java虚拟机栈" class="headerlink" title="JVM Stacks   Java虚拟机栈"></a>JVM Stacks   Java虚拟机栈</h3><p>首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它</p>
-<p>具有先进后出的特性。在栈中的数据大小与生命周期都是<strong>确定</strong>的，在方法执行完成后退出栈后，它的生命周期也就</p>
-<p>结束了。</p>
-<p>Java虚拟机栈是JVM建立的，根据《深入理解Java虚拟机》，JVMS(虚拟机栈)是<strong>线程私有的</strong>。它的生命周期与线程相同</p>
-<p><strong>注意：Java中每个方法对应一个Frame(栈帧)</strong>，每个Frame中都有Local Variables(局部变量表)，Operand Satcks(操作数栈)，Dynamic Linking(动态链接),Return Address(方法出口)。每一个方法从调用到到执行完毕，就是一个Frame在JVMS</p>
-<p>中入栈到出栈的过程。</p>
-<h4 id="图解Frame中方法的一次执行过程"><a href="#图解Frame中方法的一次执行过程" class="headerlink" title="图解Frame中方法的一次执行过程"></a>图解Frame中方法的一次执行过程</h4><pre class=" language-java"><code class="language-java"> <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span></code></pre>
-<p>这一段代码发生什么？</p>
-<p>首先看Frame中Local Variables和Operand Stack的指令图</p>
- <img src="/2019/09/29/Demo2019-9-29/01.png">
-
-<img src="/2019/09/29/Demo2019-9-29/02.png">
-
-<ul>
-<li><p>由图看出 main线程栈中经历了 ：</p>
-<ul>
-<li><p>1.指令 ipush 把100 压如<strong>操作数栈</strong>，istore 1 把栈顶元素放到<strong>局部变量表</strong>中索引为 1 的区域，注意：局部变量表有两个参数，<strong>args 和 i</strong></p>
-<img src="/2019/09/29/Demo2019-9-29/03.png">
-
-</li>
-</ul>
-</li>
-</ul>
-<pre class=" language-java"><code class="language-java"> <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token punctuation">,</span><span class="token keyword">int</span> b<span class="token punctuation">)</span><span class="token punctuation">{</span>
-        <span class="token keyword">int</span> c<span class="token operator">=</span> a<span class="token operator">+</span>b<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span></code></pre>
-<p>还是首先看Frame中Local Variables和Operand Stack的指令图</p>
-<img src="/2019/09/29/Demo2019-9-29/04.png">
-
-<img src="/2019/09/29/Demo2019-9-29/05.png">
-
-<ul>
-<li><p>add 线程栈经历了：</p>
-<ul>
-<li><p>1.指令 iload1 iload2 把提前已经在 a 和 b 的值从 操作数栈中放到 <strong>局部变量表中</strong>中索引为 1  2的区域，iadd 把a和b相加放到局部变量表的栈顶 ，istore3 把 7 弹出放到 c 中 return 结束</p>
-<img src="/2019/09/29/Demo2019-9-29/06.png">
-
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="PC-Register-程序计数器"><a href="#PC-Register-程序计数器" class="headerlink" title="PC Register 程序计数器"></a>PC Register 程序计数器</h3><p>程序计数器是一块小的内存空间，它的功能：<strong>记录当前线程执行地址</strong>，<strong>每一个线程都有一个PC 寄存器，即它为线程私有</strong>。</p>
-<ul>
-<li><p>为什么需要PC计数器：</p>
-<ul>
-<li>Java虚拟机的多线程是通过<strong>线程轮流切换</strong>并分配处理器执行时间实现的。因此，为了<strong>线程切换后能恢复到正确的执行位置</strong>，每个线程都需要一个独立的PC计数器。</li>
-</ul>
-</li>
-</ul>
-<h3 id="Native-Method-Area本地方法栈"><a href="#Native-Method-Area本地方法栈" class="headerlink" title="Native Method Area本地方法栈"></a>Native Method Area本地方法栈</h3><p>用来调用其他语言的本地方法，比如C / C++ 写得本地代码，这些方法在本地方法栈执行，而不会再Java栈中执行。<strong>它也是线程私有的</strong>。</p>
-<h3 id="Java-Head"><a href="#Java-Head" class="headerlink" title="Java Head"></a>Java Head</h3><p>Java虚拟机管理的内存中最大的一块，<strong>是所有线程共享的</strong>，几乎所有的对象实例都在这里分配。（有些小的对象有可能不在这分配，后面再说）。Java堆是垃圾收集器管理的主要区域。从内存回收角度看：现在的收集器基本都采用<strong>分代收集算法</strong>，所以Java堆还可以被分为：新生代和老年代：在细致-&gt; Eden区  两个Survivor区（1:1） Tenured(终身区)，关于垃圾回收，随后说。</p>
-<h3 id="Method-Area-方法区"><a href="#Method-Area-方法区" class="headerlink" title="Method Area 方法区"></a>Method Area 方法区</h3><p>与Java堆一样，是<strong>线程共享的</strong>，用于存储已被Java虚拟机加载的类信息   常量   静态变量   编译器编译后的代码。JVM运行时，类加载器子系统将会提取 class 文件里的类信息，并将其放到Method Area中，</p>
-<h4 id="RunTime-Constant-Pool-运行时常量池"><a href="#RunTime-Constant-Pool-运行时常量池" class="headerlink" title="RunTime Constant Pool 运行时常量池"></a>RunTime Constant Pool 运行时常量池</h4><p>Method Area中的一部分，用于存放编译期生成的各种字面量和符号引用。除了保存 Class 文件中描述的符号引用外，还会把翻译出来的<strong>直接引用</strong>也存储在运行时的常量池中。关于运行时常量池的详解。在学习完类加载顺序后再说明。</p>
-<h2 id="GC算法分配策略"><a href="#GC算法分配策略" class="headerlink" title="GC算法分配策略"></a>GC算法分配策略</h2><p>首先看一张Heap中从内存回收角度的分布图：</p>
-<img src="/2019/09/29/Demo2019-9-29/09.png">
-
-<p>现在来解释：</p>
-<ul>
-<li><p>首先 eden 区和 Survivor区比例为 8：1:1，至于为何，应该是经过多次试验，这样分配最好吧，后期可以调参，新生代产生的垃圾比较多，Old 老年代产生的相对少。所以新生代多使用 Copying 复制垃圾回收算法。老年代多使用 Mark Compact 标记整理算法。至于为何。看下文！</p>
-<h3 id="GC-过程"><a href="#GC-过程" class="headerlink" title="GC 过程"></a>GC 过程</h3></li>
-<li><p>当 new 了一个对象。如果JVM检测到它<strong>“ 很大 ”</strong>，何为大对象：需要大量连续内存空间的Java对象，最典型的就是很长的字符串以及数组，它们会被直接<strong>放到Old老年代</strong>。</p>
-</li>
-<li><p>在正常的情况下：</p>
-<ul>
-<li><p>对象<strong>优先先放到Eden</strong>,如果不需要它了，GC，如果发现有的引用还指向它。把这个对象 Copy 到Survivor区中的S0  S1中的一个，比如S0</p>
-</li>
-<li><p>GC开始 如果发现S0中这个对象不存在了，直接回收，如果依然存在，在 Copy 到 S1 中</p>
-</li>
-<li><p>在来一次 GC ,发现它在 S1 中还存在(需要生存),又 Copy 到 S0 中，循环往复 <strong>15次</strong>，发现对象一直存在，直接放到<strong>Old</strong>区。</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="什么是-垃圾对象（如何确定它）"><a href="#什么是-垃圾对象（如何确定它）" class="headerlink" title="什么是 垃圾对象（如何确定它）"></a>什么是 垃圾对象（如何确定它）</h3><p>一句话，未来不会再被用的对象，如何确定它？</p>
-<ul>
-<li><p>引用计数：</p>
-<p>对象会有一个<strong>对象头</strong>，有一个引用计数器，默认为 0 ，来一个引用，计数器加 1 ，当引用失效，计数器就减 1 ，当减为 0 时，为 垃圾 ——&gt;GC;</p>
-<ul>
-<li>缺点：很明显，它很容易因为对象之间相互循环引用，最终造成<strong>Memory Leak</strong>.</li>
-</ul>
-</li>
-<li><p>Root Searching 根搜索 正向可达</p>
-<ul>
-<li><p>Searching from the roots instance</p>
-</li>
-<li><p>Which instance is roots instance?</p>
-</li>
-</ul>
-</li>
-</ul>
-<p>​              JVM Stacks引用的对象     Native Method Stacks 引用的对象      RunTime Constant Pool 常量池中引用引用的对象   Static reference in method area 引用的对象</p>
-<ul>
-<li><p>实现：</p>
-<p>根据这些跟对象传出的引用去找，看有什么对象可以找到，能找到(可达）的都不是垃圾，反之是垃圾</p>
-</li>
-</ul>
-<h3 id="如何清除垃圾"><a href="#如何清除垃圾" class="headerlink" title="如何清除垃圾"></a>如何清除垃圾</h3><ul>
-<li><p>1.Mark-Sweep 标记-清除：</p>
-<p>首先标记出所有需要回收的对象，在标记完成后统一回收所有被标记的对象。</p>
-<ul>
-<li>它很简单，但是有两点不足：一是<strong>效率不高，二是带来了内存碎片化问题</strong></li>
-</ul>
-</li>
-<li><p>2.Copying 复制算法</p>
-<p>  事先准备两块大小相等的内存，每次只使用一块，当这一块使用完了，将还存活的对象<strong>复制</strong>到另一块中，在清除已使用过的内存空间。很明显，<strong>内存浪费</strong>。</p>
-</li>
-<li><p>3.Mark-Compact 标记-整理</p>
-<img src="/2019/09/29/Demo2019-9-29/10.png">
-
-<p>标记过程与 “ 标记 清除” 一样，但后续中：让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存。</p>
-<h2 id="再谈Java对象的分配"><a href="#再谈Java对象的分配" class="headerlink" title="再谈Java对象的分配"></a>再谈Java对象的分配</h2></li>
-<li><p>1.一个小的对象，在JDK1.8之后，会首先放到栈上</p>
-</li>
-</ul>
-<p><strong>放到栈上的对象具备以下特征：1.线程私有化的  2.无逃逸（一个对象只有这个这个方法用，其他方法没有用）3.支持标量替换</strong>。</p>
-<p>栈上分配的好处：<strong>自动回收（弹栈）</strong>。</p>
-<ul>
-<li>2.栈上不能分配了，或者它逃逸了，那么会被<strong>分配到线程本地TLAB(位于堆的Eden区，占用Eden的 1% 的空间)，它的优点在于：多线程下，小对象不用竞争eden区就可以申请空间，提高了效率。</strong></li>
-<li>3.看是否是 大对象，是的话，直接 Old 老年代。</li>
-<li>4.不是，进入Eden</li>
-</ul>
-<p>​    </p>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/JVM/">JVM</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GC/">GC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JVM内存模型/">JVM内存模型</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/10/06/Test/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          Test
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/09/21/Demo2019-9-21/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">JSP与Session初学</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM-Run-Time-Data-Area-运行时数据区"><span class="nav-number">1.</span> <span class="nav-text">JVM Run-Time Data Area 运行时数据区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JVM-Stacks-Java虚拟机栈"><span class="nav-number">1.1.</span> <span class="nav-text">JVM Stacks   Java虚拟机栈</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#图解Frame中方法的一次执行过程"><span class="nav-number">1.1.1.</span> <span class="nav-text">图解Frame中方法的一次执行过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PC-Register-程序计数器"><span class="nav-number">1.2.</span> <span class="nav-text">PC Register 程序计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Native-Method-Area本地方法栈"><span class="nav-number">1.3.</span> <span class="nav-text">Native Method Area本地方法栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-Head"><span class="nav-number">1.4.</span> <span class="nav-text">Java Head</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Method-Area-方法区"><span class="nav-number">1.5.</span> <span class="nav-text">Method Area 方法区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RunTime-Constant-Pool-运行时常量池"><span class="nav-number">1.5.1.</span> <span class="nav-text">RunTime Constant Pool 运行时常量池</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GC算法分配策略"><span class="nav-number">2.</span> <span class="nav-text">GC算法分配策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GC-过程"><span class="nav-number">2.1.</span> <span class="nav-text">GC 过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是-垃圾对象（如何确定它）"><span class="nav-number">2.2.</span> <span class="nav-text">什么是 垃圾对象（如何确定它）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何清除垃圾"><span class="nav-number">2.3.</span> <span class="nav-text">如何清除垃圾</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#再谈Java对象的分配"><span class="nav-number">3.</span> <span class="nav-text">再谈Java对象的分配</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

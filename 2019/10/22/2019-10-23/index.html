@@ -1,625 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Redis初识 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Redis">
-  
-  
-  
-  
-  <meta name="description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
-<meta name="keywords" content="Redis">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Redis初识">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/10/22/2019-10-23/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/1.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/2.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/3.png">
-<meta property="og:updated_time" content="2020-05-31T08:05:27.641Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Redis初识">
-<meta name="twitter:description" content="Redis 概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/10/22/2019-10-23/1.png">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-10-23" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Redis初识
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/10/22/2019-10-23/" class="article-date">
-	  <time datetime="2019-10-22T09:48:40.000Z" itemprop="datePublished">十月 22, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Redis/">Redis</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><ul>
-<li>概念：redis是一款高性能的NOSQL系列的非关系型数据库,redis内部是一个key-value存储系统。它支持存储的value类型相对更多，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型，类似于Java中的map）。Redis基于内存运行并支持持久化的NoSQL数据库，是当前最热门的NoSql数据库之一，也被人们称为数据结构服务器.</li>
-</ul><a id="more"></a>
-<h3 id="为什么用-Redis"><a href="#为什么用-Redis" class="headerlink" title="为什么用 Redis"></a>为什么用 Redis</h3><p>互联网时代背景下: </p>
-<ul>
-<li><p>当数据量的总大小一个机器放不下时。 </p>
-</li>
-<li><p>数据索引一个机器的内存放不下时。 </p>
-</li>
-<li><p>访问量（读写混合）一个实例放不下时</p>
-</li>
-<li><p>单机时代：</p>
-<img src="/2019/10/22/2019-10-23/1.png">
-
-</li>
-</ul>
-<p>如果每次存储成千上万条数据，这样很会导致mysql的性能很差，存储以及读取速度很慢，然后就演变成缓存+mysql+垂直拆分的方式</p>
-<img src="/2019/10/22/2019-10-23/2.png">
-
-<p>Cache作为中间缓存<br>将所有的数据先保存到缓存中，然后再存入mysql中，减小数据库压力，提高效率。<br>但是当数据再次增加到又一个量级，上面的方式也不能满足需求，大部分网站开始使用主从复制技术来达到读写分离，以提高读写性能和读库的可扩展性。Mysql的master-slave模式成为这个时候的网站标配了。</p>
-<img src="/2019/10/22/2019-10-23/3.png">
-
-<p>主从分离模式<br>在redis的高速缓存，MySQL的主从复制，读写分离的基础之上，这时MySQL主库的写压力开始出现瓶颈，而数据量的持续猛增，高并发下会出现严重的锁问题，大量的高并发MySQL应用开始使用<strong>InnoDB引擎</strong>代替MyISAM。</p>
-<h2 id="Redis的优势"><a href="#Redis的优势" class="headerlink" title="Redis的优势"></a>Redis的优势</h2><ul>
-<li><p>易扩展</p>
-</li>
-<li><p>大数据量提高性能</p>
-</li>
-<li><p>多样灵活的数据格式</p>
-</li>
-</ul>
-<h2 id="Redia的安装与介绍"><a href="#Redia的安装与介绍" class="headerlink" title="Redia的安装与介绍"></a>Redia的安装与介绍</h2><ol>
-<li><p>官网：<a href="https://redis.io" target="_blank" rel="noopener">https://redis.io</a></p>
-</li>
-<li><p>中文网：<a href="http://www.redis.net.cn/" target="_blank" rel="noopener">http://www.redis.net.cn/</a></p>
-</li>
-<li><p>介绍：</p>
-<ul>
-<li>redis.windows.conf：配置文件</li>
-<li>redis-cli.exe：redis的客户端</li>
-<li>redis-server.exe：redis服务器端<h2 id="Redis的数据结构"><a href="#Redis的数据结构" class="headerlink" title="Redis的数据结构"></a>Redis的数据结构</h2>redis存储的是：key,value 格式的数据，其中 key 都是键值对；value 有5种不同的数据结构</li>
-<li>value 的5种数据结构：</li>
-<li>字符串类型 String</li>
-<li>哈希类型 hash  map的格式</li>
-<li>列表类型 list     linkedlist格式</li>
-<li>集合类型   </li>
-<li>有序集合类型  <h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2></li>
-</ul>
-</li>
-</ol>
-<ul>
-<li><p>字符串操作</p>
-<ul>
-<li><p>存储：<code>set key value</code></p>
-</li>
-<li><p>获取：<code>get key</code></p>
-</li>
-<li><p>删除：<code>del key</code></p>
-</li>
-</ul>
-</li>
-<li><p>哈希类型</p>
-<ul>
-<li><p>存储：<code>hset key field value</code></p>
-</li>
-<li><p>获取：</p>
-<p>​       <code>hget key field</code>:获取指定的field对应的值</p>
-<p>​    <code>hgetall key</code> 获取所有的field和value</p>
-</li>
-<li><p>删除：<code>hdel key field</code></p>
-</li>
-</ul>
-</li>
-<li><p>列表类型：可以添加一个元素到列表的头部（左边）或者尾部（右边）</p>
-<ul>
-<li>添加：<code>lpush key value</code>将元素加入列表左边；</li>
-</ul>
-</li>
-</ul>
-<p>​                          <code>rpush key value</code>将元素加入列表右边</p>
-<p>​         获取：<code>lrange key start end</code>:范围获取</p>
-<p>​         删除：<code>lpop key</code>: 删除列表左边的元素并将元素返回；<code>rpop key</code></p>
-<ul>
-<li><p>集合类型：不允许重复元素，元素无序</p>
-<ul>
-<li>存储：<code>sadd key value</code></li>
-<li>获取：<code>smembers key</code>:获取 set 集合中所有的元素</li>
-<li>删除：<code>srem key value</code>:删除集合中的某个元素</li>
-</ul>
-</li>
-<li><p>有序集合：sortedset 不允许重复元素，元素有序,.每个元素都会关联一个double类型的分数。redis正是通过分数来为集合中的成员进行从小到大的排序。</p>
-<ul>
-<li><p>存储：<code>zadd key score value</code></p>
-</li>
-<li><p>获取：<code>zrange key start end</code></p>
-<pre class=" language-r"><code class="language-r"><span class="token number">1</span>. 存储：zadd key score value
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">60</span> zhangsan
-                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">50</span> lisi
-                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zadd mysort <span class="token number">80</span> wangwu
-                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
-            <span class="token number">2</span>. 获取：zrange key start end <span class="token punctuation">[</span>withscores<span class="token punctuation">]</span>
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrange mysort <span class="token number">0</span> <span class="token operator">-</span><span class="token number">1</span>
-                <span class="token number">1</span><span class="token punctuation">)</span> <span class="token string">"lisi"</span>
-                <span class="token number">2</span><span class="token punctuation">)</span> <span class="token string">"zhangsan"</span>
-                <span class="token number">3</span><span class="token punctuation">)</span> <span class="token string">"wangwu"</span>
-
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrange mysort <span class="token number">0</span> <span class="token operator">-</span><span class="token number">1</span> withscores
-                <span class="token number">1</span><span class="token punctuation">)</span> <span class="token string">"zhangsan"</span>
-                <span class="token number">2</span><span class="token punctuation">)</span> <span class="token string">"60"</span>
-                <span class="token number">3</span><span class="token punctuation">)</span> <span class="token string">"wangwu"</span>
-                <span class="token number">4</span><span class="token punctuation">)</span> <span class="token string">"80"</span>
-                <span class="token number">5</span><span class="token punctuation">)</span> <span class="token string">"lisi"</span>
-                <span class="token number">6</span><span class="token punctuation">)</span> <span class="token string">"500"</span>
-            <span class="token number">3</span>. 删除：zrem key value
-                <span class="token number">127.0</span>.<span class="token number">0.1</span><span class="token operator">:</span><span class="token number">6379</span><span class="token operator">></span> zrem mysort lisi
-                <span class="token punctuation">(</span>integer<span class="token punctuation">)</span> <span class="token number">1</span>
-</code></pre>
-</li>
-</ul>
-</li>
-<li><p>通用命令</p>
-<ul>
-<li><code>keys *</code>查询所有的键</li>
-<li><code>type key</code>键值类型</li>
-<li><code>del key</code>删除指定的键值对<h2 id="Redis的持久化"><a href="#Redis的持久化" class="headerlink" title="Redis的持久化"></a>Redis的持久化</h2></li>
-</ul>
-<p>redis 是一个内存数据库，当Redis 服务器重启，或者电脑重启，数据多会丢失，可以将 redis 内存中的数据持久化到硬盘的文件中。</p>
-</li>
-<li><p>Redis 持久化的机制</p>
-<ul>
-<li><p>RDB:默认方式，在一定的间隔时间中，检测 key 的变化情况，然后持久化。</p>
-<ul>
-<li><p>1.具体操作：编辑 redis.windows.conf文件</p>
-<pre class=" language-xml"><code class="language-xml">after 900 sec (15 min) if at least 1 key changed
-#   after 300 sec (5 min) if at least 10 keys changed
-#   after 60 sec if at least 10000 keys changed</code></pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>  ```xm
-  save 900 1
-  save 300 10
-  save 60  10000
-  ```
-
-- 重新启动redis服务器，并指定配置文件名称
-  D:\redis\windows-64\redis-2.8.9&gt;redis-server.exe redis.windows.conf    </code></pre><ul>
-<li>ADF:日志记录的方式，可以记录每一条命令的操作，在每一条命令后，持久化数据（不推荐）</li>
-</ul>
-<h2 id="Java-客户端-Jedis"><a href="#Java-客户端-Jedis" class="headerlink" title="Java 客户端 Jedis"></a>Java 客户端 Jedis</h2><ul>
-<li>Jedis :一款java操作redis数据库的工具.<ul>
-<li><ol>
-<li>下载jedis的jar包<ul>
-<li><ol start="2">
-<li>使用<ul>
-<li><ol>
-<li>获取连接<br><code>Jedis jedis = new Jedis(&quot;localhost&quot;,6379);</code></li>
-</ol>
-</li>
-</ul>
-</li>
-</ol>
-<ul>
-<li><ol start="2">
-<li>操作<br><code>jedis.set(&quot;username&quot;,&quot;zhangsan&quot;);</code></li>
-</ol>
-</li>
-<li><ol start="3">
-<li>关闭连接<br><code>jedis.close()</code></li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li><p>2 .Jedis操作各种redis中的数据结构</p>
-<ul>
-<li><p>1.字符串类型 string</p>
-<pre class=" language-java"><code class="language-java"> <span class="token comment" spellcheck="true">//1. 获取连接</span>
-                Jedis jedis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jedis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//如果使用空参构造，默认值 "localhost",6379端口</span>
-                <span class="token comment" spellcheck="true">//2. 操作</span>
-                <span class="token comment" spellcheck="true">//存储</span>
-                jedis<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">,</span><span class="token string">"zhangsan"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                <span class="token comment" spellcheck="true">//获取</span>
-                String username <span class="token operator">=</span> jedis<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-                <span class="token comment" spellcheck="true">//可以使用setex()方法存储可以指定过期时间的 key value</span>
-                jedis<span class="token punctuation">.</span><span class="token function">setex</span><span class="token punctuation">(</span><span class="token string">"activecode"</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token string">"hehe"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//将activecode：hehe键值对存入redis，并且20秒后自动删除该键值对</span>
-
-                <span class="token comment" spellcheck="true">//3. 关闭连接</span>
-                jedis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-<ul>
-<li><p>哈希类型 hash ： map格式  </p>
-<p>hset</p>
-<p>hget<br>hgetAll</p>
-<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//1. 获取连接</span>
-               Jedis jedis <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jedis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//如果使用空参构造，默认值 "localhost",6379端口</span>
-               <span class="token comment" spellcheck="true">//2. 操作</span>
-               <span class="token comment" spellcheck="true">// 存储hash</span>
-               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"name"</span><span class="token punctuation">,</span><span class="token string">"lisi"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"age"</span><span class="token punctuation">,</span><span class="token string">"23"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-               jedis<span class="token punctuation">.</span><span class="token function">hset</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span><span class="token string">"gender"</span><span class="token punctuation">,</span><span class="token string">"female"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-               <span class="token comment" spellcheck="true">// 获取hash</span>
-               String name <span class="token operator">=</span> jedis<span class="token punctuation">.</span><span class="token function">hget</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">,</span> <span class="token string">"name"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-               System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-</code></pre>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>                   // 获取hash的所有map中的数据
-                   Map&lt;String, String&gt; user = jedis.hgetAll(&quot;user&quot;);
-
-                   // keyset
-                   Set&lt;String&gt; keySet = user.keySet();
-                   for (String key : keySet) {
-                       //获取value
-                       String value = user.get(key);
-                       System.out.println(key + &quot;:&quot; + value);
-                   }
-
-                   //3. 关闭连接
-                   jedis.close();
-   ```</code></pre><h2 id="Jdeis连接池"><a href="#Jdeis连接池" class="headerlink" title="Jdeis连接池"></a>Jdeis连接池</h2><ul>
-<li><ol>
-<li>创建JedisPool连接池对象</li>
-</ol>
-</li>
-<li><ol start="2">
-<li><p>调用方法 getResource()方法获取Jedis连接</p>
-<pre><code> ```java</code></pre><p>连接池工具类</p>
-<pre><code>       public class JedisPoolUtils {
-
-           private static JedisPool jedisPool;
-
-           static{
-               //读取配置文件
-               InputStream is = JedisPoolUtils.class.getClassLoader().getResourceAsStream(&quot;jedis.properties&quot;);
-               //创建Properties对象
-               Properties pro = new Properties();
-               //关联文件
-               try {
-                   pro.load(is);
-               } catch (IOException e) {
-                   e.printStackTrace();
-               }
-               //获取数据，设置到JedisPoolConfig中
-               JedisPoolConfig config = new JedisPoolConfig();
-               config.setMaxTotal(Integer.parseInt(pro.getProperty(&quot;maxTotal&quot;)));
-               config.setMaxIdle(Integer.parseInt(pro.getProperty(&quot;maxIdle&quot;)));
-
-               //初始化JedisPool
-               jedisPool = new JedisPool(config,pro.getProperty(&quot;host&quot;),Integer.parseInt(pro.getProperty(&quot;port&quot;)));</code></pre></li>
-</ol>
-</li>
-</ul>
-<pre><code>                }
-
-
-                /**
-                 * 获取连接方法
-                 */
-                public static Jedis getJedis(){
-                    return jedisPool.getResource();
-                }
-            }
-      ```</code></pre>
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Redis/">Redis</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/">Redis</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/10/28/2019-10-28/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          Java设计模式之工厂模式
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/10/22/2019-10-22/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">Ajax与JSON</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">1.</span> <span class="nav-text">Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么用-Redis"><span class="nav-number">1.1.</span> <span class="nav-text">为什么用 Redis</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的优势"><span class="nav-number">2.</span> <span class="nav-text">Redis的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redia的安装与介绍"><span class="nav-number">3.</span> <span class="nav-text">Redia的安装与介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的数据结构"><span class="nav-number">4.</span> <span class="nav-text">Redis的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本命令"><span class="nav-number">5.</span> <span class="nav-text">基本命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis的持久化"><span class="nav-number">6.</span> <span class="nav-text">Redis的持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-客户端-Jedis"><span class="nav-number">7.</span> <span class="nav-text">Java 客户端 Jedis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jdeis连接池"><span class="nav-number">8.</span> <span class="nav-text">Jdeis连接池</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

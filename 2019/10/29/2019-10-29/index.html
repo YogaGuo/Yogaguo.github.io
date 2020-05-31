@@ -1,394 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="Java内存模型">
-  
-  
-  
-  
-  <meta name="description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。 ​     在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工">
-<meta name="keywords" content="Java内存模型">
-<meta property="og:type" content="article">
-<meta property="og:title" content="&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/10/29/2019-10-29/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。 ​     在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/10/29/2019-10-29/01.jpg">
-<meta property="og:updated_time" content="2020-05-31T12:10:43.377Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before">
-<meta name="twitter:description" content="Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。 ​     在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/10/29/2019-10-29/01.jpg">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-10-29" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      &lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/10/29/2019-10-29/" class="article-date">
-	  <time datetime="2019-10-29T08:33:24.000Z" itemprop="datePublished">十月 29, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Java并发编程/">Java并发编程</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p>
-<p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p>
-<p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p>
-<p>在线程执行时，首先从主存中的read值，在load到工作内存中，交给CPU处理，执行完毕，再给工作内存中的变量重写赋值，最后刷新回主存。</p>
-<h2 id="指令重排"><a href="#指令重排" class="headerlink" title="指令重排"></a>指令重排</h2><p>在执行程序时，为了提高性能，编译期和处理器常常会对指令进行重排序。</p>
-<h3 id="数据依懒性"><a href="#数据依懒性" class="headerlink" title="数据依懒性"></a>数据依懒性</h3><p>如果两个操作操作访问同一个变量，且这两个操作中有一个 <strong>写操作</strong>，此时这两个操作就存在数据依懒性。</p>
-<p>只要重排这两个操作的执行顺序，执行结果就会被改变！所以<strong>编译期和处理器不会改变存在数据依懒性的两个操作的执行顺序</strong>。</p>
-<h3 id="as-if-serial-有序性"><a href="#as-if-serial-有序性" class="headerlink" title="as-if-serial(有序性)"></a>as-if-serial(有序性)</h3><p>不管如何重排序，<strong>单线程</strong>的程序执行结果不会被改变。编译期和处理器必须遵守 as-if-serial语义。所以编译期和处理器不会对存在数据依懒性的操作重排序。</p>
-<p>as-if-serial语义把单线程程序 “保护起来”，</p>
-<h3 id="happens-before-有序性"><a href="#happens-before-有序性" class="headerlink" title="happens-before(有序性)"></a>happens-before(有序性)</h3><p><strong>happens-before 要求前一个操作（执行的结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前。并不要求前一个操作必须要在后一个之前执行</strong></p>
-<ul>
-<li><p>程序顺序规则：一个线程中的每个操作，happens-before 于该线程中的任意后续操作</p>
-</li>
-<li><p>监视器锁规则：对一个锁的解锁，happens-before 于随后对这个锁的加锁</p>
-</li>
-<li><p>volatile:对一个volatile域的写，happens-before 于后续任意对这个 volatile 域的读</p>
-</li>
-<li><p>传递性：A happens-before B    B happens-before C ——》A happens-before C</p>
-</li>
-<li><p>start() 规定：线程 A 执行操作 ThreadB.start(启动线程B)，则线程 A 的 ThreadB.start 操作 happens-before 于线程B的任意操作</p>
-<ul>
-<li>比如：线程A在执行ThreadB.start()之前修改了一些共享变量，线程B在开始执行时会读到修改的变量</li>
-</ul>
-</li>
-<li><p>join()规则：线程A执行操作Thread.join()并成功返回，则线程B中任意操作 happens-before于线程A从Thread.join()操作成功返回。</p>
-</li>
-</ul>
-<h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><p>在单线程中，存在 as-if-serial，所以不会不会改变执行结果。但在多线程中，重排序会对执行结果修改。</p>
-<p>当程序未正确同步时，就可能存在<strong>数据竞争</strong>（在一个线程读，在一个线程写，写与读未同步），当存在数据竞争时，运行结果往往不一样。如果一个多线程正确同步。就没有数据竞争。JMM对正确同步的多线程程序内存一致性做了保证：即顺序一致性（程序的执行结果与在顺序一致性内心模型中的执行结果相同）。</p>
-<p><strong>而未同步的程序在JMM中执行时，整体上无序，执行结果也未知</strong></p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">T9</span> <span class="token punctuation">{</span>
-     <span class="token keyword">boolean</span> runing<span class="token operator">=</span><span class="token boolean">true</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//加上volatile，线程就会结束。否则一直死循环</span>
-    <span class="token keyword">void</span> <span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m start"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">while</span><span class="token punctuation">(</span>runing<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-
-        <span class="token punctuation">}</span>
-          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m end"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
-    <span class="token punctuation">}</span>
-    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        T9 t<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">T9</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span>t<span class="token punctuation">.</span><span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">try</span> <span class="token punctuation">{</span>
-            TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-        t<span class="token punctuation">.</span>runing<span class="token operator">=</span><span class="token boolean">false</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-当线程t1开始运行的时候，会把running值从内存中读到t1线程的工作区，在运行过程过程中直接使用这个copy，并不会每次都去
- 读取堆内存，这样，当主线程修改running的值后，t1线程感知不到，所以不会停止运行
-</code></pre>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/Java并发编程/">Java并发编程</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java内存模型/">Java内存模型</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/11/03/2019-11-03/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          一致性哈希算法的原理
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/10/28/2019-10-28/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">Java设计模式之工厂模式</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java内存模型概述"><span class="nav-number">1.</span> <span class="nav-text">Java内存模型概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指令重排"><span class="nav-number">2.</span> <span class="nav-text">指令重排</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据依懒性"><span class="nav-number">2.1.</span> <span class="nav-text">数据依懒性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#as-if-serial-有序性"><span class="nav-number">2.2.</span> <span class="nav-text">as-if-serial(有序性)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#happens-before-有序性"><span class="nav-number">2.3.</span> <span class="nav-text">happens-before(有序性)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重排序对多线程的影响"><span class="nav-number">2.4.</span> <span class="nav-text">重排序对多线程的影响</span></a></li></ol></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

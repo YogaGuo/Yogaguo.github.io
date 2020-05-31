@@ -1,380 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>一致性哈希算法的原理 | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="哈希">
-  
-  
-  
-  
-  <meta name="description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
-<meta name="keywords" content="哈希">
-<meta property="og:type" content="article">
-<meta property="og:title" content="一致性哈希算法的原理">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/11/03/2019-11-03/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/1.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/2.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/3.png">
-<meta property="og:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/4.png">
-<meta property="og:updated_time" content="2020-05-31T12:10:27.388Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一致性哈希算法的原理">
-<meta name="twitter:description" content="一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：  无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.  如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行   请注意，这种缓存策略可能带来一个问题：  如果现在是双十一，我要加机器来满足负载">
-<meta name="twitter:image" content="https://yogaguo.github.io/2019/11/03/2019-11-03/1.png">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-11-03" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      一致性哈希算法的原理
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/11/03/2019-11-03/" class="article-date">
-	  <time datetime="2019-11-03T10:42:54.000Z" itemprop="datePublished">十一月 3, 2019</time>
-	</a>
-
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/算法/">算法</a>
- 
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="一种常见的场景："><a href="#一种常见的场景：" class="headerlink" title="一种常见的场景："></a>一种常见的场景：</h3><p> 工程师经常使用<strong>服务器集群</strong>来设计和实现<strong>数据缓存</strong>，经典的策略是：</p>
-<ul>
-<li><p>无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.</p>
-</li>
-<li><p>如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行</p>
-</li>
-</ul>
-<p>请注意，这种缓存策略可能带来一个问题：</p>
-<ul>
-<li>如果现在是双十一，我要<strong>加机器</strong>来满足负载，或者是有时候要<strong>去掉</strong>几台机器，N变化了，所有的数据都不得不根据 id 重新计算一遍哈希值，并将哈希值对新的机器取模，然后就是大规模的数据迁移。这个代价很高！</li>
-</ul>
-<p>为了解决这个问题，引入<strong>一致性哈希算法</strong>，这是一种很好的数据缓存设计方案。</p>
-<p>假设所有的数据的 id 通过哈希函数转换成的哈希范围是 2^23,范围在 0 ~（2^23）-1 的数字空间中。现在我们可以将这些数字头尾相连。想象成一个闭合的环形，那么一个数据在计算出哈希值之后就会认为对应到环中的一个位置。</p>
-<p>接下来，想象有三台机器通过自己的 ip 计算出来后也在这样的一个环中的各自位置上，那么一条数据如何确定归属那台机器？</p>
-<ul>
-<li><p>首先把数据的 id 用哈希函数计算出哈希值，并映射到环上相应位置。</p>
-</li>
-<li><p>然后<strong>顺时针</strong>寻找离自己位置最近的机器，这台机器就是该数据的归属。</p>
-<img src="/2019/11/03/2019-11-03/1.png">
-
-</li>
-</ul>
-<p>在图 6-4中，data1根据其 id 计算出的哈希值为 key1 ,顺时针的第一台机器是 machine2,所以data1归属；同理，data2归属 machine3,data3和data4归属 machine1.</p>
-<p>增加机器时的处理：假设有两台机器（m1 m2）和三个数据（data1 data2 data3）,数据和机器在环上的结构图 6-5</p>
-<p>如果此时想加入新的机器 m3 ,同时算出机器 m3 的 id 在 m1和 m2 右半边的环上，那么发生 的变化如图 6-6</p>
-<img src="/2019/11/03/2019-11-03/2.png">
-
-<p>在没有添加 m3 之前，从 m1 到现在 m3 位置上的这一段是 m2 掌管的一部分；添加 m3 之后统一归属 m3 ,同时要把这一段的数据从 m2 迁移到 m3 上。由此可见，添加机器时的调整是比较小的。在删除机器时也一样。只要把要删除机器中的机器全部迁移到顺时针找到的机器中。</p>
-<h3 id="机器负载不均的处理"><a href="#机器负载不均的处理" class="headerlink" title="机器负载不均的处理"></a>机器负载不均的处理</h3><p> 根据哈希性质，它的离散型是随着输入域量的增加变好的，实现几乎均匀分布。如果机器较少，有可能造成机器在整个环上的分布不均匀，从而导致机器之间的负载不均衡。比如。图6-7 所示的两台机器，m1可能比m2 面临更大的负载。</p>
-<img src="/2019/11/03/2019-11-03/3.png">
-
-<p>为了解决这种问题，一致性哈希算法引入了<strong>虚拟节点机制</strong>,即对每一台机器通过不同的哈希函数计算出多个哈希值，对多个位置都放置一个服务节点，称为虚拟节点。</p>
-<img src="/2019/11/03/2019-11-03/4.png">
-
-<p>具体做法可以在机器 ip 或 hostname 的后面增加编号或端口号来实现。以图6-7的看，可以为每台机器计算两个节点，分别为m1-1 ,m1-2和m2-1 m2-2的哈希值，于是就形成了四个虚拟节点，这样节点数就变多了，根据哈希函数的性质，平衡性自然会变好。</p>
-<p>当某一条数据计算出归属于m1-2时，再根据表的跳转，数据将最终归属于实际的m1机器。</p>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/算法/">算法</a>
-
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/哈希/">哈希</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/11/08/2019-11-8/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          从JVM层理解Java方法调用
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/10/29/2019-10-29/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">&lt; Java并发编程的艺术&gt;读后总结 一Java内存模型与happens-before</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一种常见的场景："><span class="nav-number">1.</span> <span class="nav-text">一种常见的场景：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#机器负载不均的处理"><span class="nav-number">2.</span> <span class="nav-text">机器负载不均的处理</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug

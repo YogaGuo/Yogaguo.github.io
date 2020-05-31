@@ -1,532 +1,79 @@
-<!DOCTYPE html>
-<html>
-<head><meta name="generator" content="Hexo 3.9.0">
-  <meta charset="utf-8">
+extends includes/layout.pug
+
+block top_img
+  - var top_img =  page.top_img || page.cover || theme.post_meta.top_img || theme.default_top_img
+  - var bg_img = top_img !== true ? `background-image: url(${top_img})` : ''
+  div#top-container(style=bg_img)
+    #post-info
+      #post-title
+          .posttitle= page.title || _p('no_title')
+      #post-meta
+        if (theme.post_meta.date_type)
+          if (theme.post_meta.date_type === 'both')
+            time.post-meta__date
+              i.fa.fa-calendar(aria-hidden="true")
+              =' '+_p('post.created')+' '+date(page.date, config.date_format)
+              span.post-meta__separator |
+              i.fa.fa-history(aria-hidden="true")
+              =' '+_p('post.updated')+' '+date(page.updated, config.date_format)
+          else
+            - var date_type = theme.post_meta.date_type === 'updated' ? 'updated' : 'date'
+            time.post-meta__date #[i.fa.fa-calendar(aria-hidden="true")] #[=date(page[date_type], config.date_format)]
+                  
+        if (theme.post_meta.categories && page.categories.data.length > 0)
+          if (theme.post_meta.date_type)
+            span.post-meta__separator.mobile_hidden |
+          span.mobile_hidden
+            each item, index in page.categories.data
+              i.fa.fa-inbox.post-meta__icon(aria-hidden="true")
+              a(href=url_for(item.path)).post-meta__categories #[=item.name]
+              if (index < page.categories.data.length - 1)
+                i.fa.fa-angle-right(aria-hidden="true")
+        .post-meta-wordcount
+          if (theme.wordcount && theme.wordcount.enable)
+            i.fa.fa-file-word-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.wordcount') + ': '
+            span.word-count= wordcount(page.content)
+            span.post-meta__separator |
+            i.fa.fa-clock-o.post-meta__icon(aria-hidden="true")
+            span= _p('post.min2read', min2read(page.content, {cn: 350, en: 160}))
+          if (theme.wordcount && theme.wordcount.enable && theme.busuanzi.page_pv)
+            span.post-meta__separator |
+          if theme.busuanzi.page_pv
+            i.fa.fa-eye.post-meta__icon(aria-hidden="true")        
+            span= _p('post.page_pv') + ': '
+            span#busuanzi_value_page_pv
+
+
+block content
+  article#post(class="")
+    #post-content.article-container!= page.content
+  if (theme.post_copyright && theme.post_copyright.enable && page.copyright != false)
+    .post-copyright
+      .post-copyright__author
+        span.post-copyright-meta= _p('post.copyright.author') + ": "
+        span.post-copyright-info
+          a(href=`mailto:${config.email}`) #[=config.author]
+      .post-copyright__type
+        span.post-copyright-meta= _p('post.copyright.link') + ": "
+        span.post-copyright-info
+          a(href=url_for(page.permalink)) #[=page.permalink]
+      .post-copyright__notice
+        span.post-copyright-meta= _p('post.copyright.copyright_notice') + ": "
+        span.post-copyright-info!= _p('post.copyright.copyright_content', theme.post_copyright.license_url, theme.post_copyright.license, config.url, config.title)
   
-  <title>Ajax与JSON | 小鱼儿的技术博客</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <meta name="keywords" content="AJAX">
-  
-  
-  
-  
-  <meta name="description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
-<meta name="keywords" content="AJAX">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Ajax与JSON">
-<meta property="og:url" content="https://Yogaguo.github.io/2019/10/22/2019-10-22/index.html">
-<meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-31T12:11:26.886Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Ajax与JSON">
-<meta name="twitter:description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
-  
-    <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
-  
-  <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
-  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <style type="text/css">
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
-    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
-    
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-
-  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/style.css">
-
-  <script src="/js/jquery-3.1.1.min.js"></script>
-
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <link rel="stylesheet" href="/css/fashion.css">
-  <link rel="stylesheet" href="/css/glyphs.css">
-
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
-</html>
-
-
-  <body data-spy="scroll" data-target="#toc" data-offset="50">
-
-
-  
-
-
-<header id="allheader" class="site-header" role="banner" 
-   >
-  <div class="clearfix container">
-      <div class="site-branding">
-
-          <h1 class="site-title">
-            
-              <a href="/" rel="home" >
-                <img style="margin-bottom: 10px;"  width="124px" height="124px" alt="Hike News" src="https://hexo.io/logo.svg">
-              </a>
-            
-          </h1>
-          
-          
-            <div class="site-description">技术博客，Java编程，算法学习</div>
-          
-            
-          <nav id="main-navigation" class="main-navigation" role="navigation">
-            <a class="nav-open">Menu</a>
-            <a class="nav-close">Close</a>
-
-            <div class="clearfix sf-menu">
-              <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">首页</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">归档</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">分类</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">标签</a> </li>
-                    
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">关于</a> </li>
-                    
-              </ul>
-            </div>
-          </nav>
-
-      </div>
-  </div>
-</header>
-
-
-  <div id="container">
-    <div id="wrap">
-            
-      <div id="content" class="outer">
+  .tag_share
+    if (theme.post_meta.tags)
+      .post-meta__tag-list
+        each item, index in page.tags.data
+          a(href=url_for(item.path)).post-meta__tags #[=item.name]    
+    include includes/share/index.pug
         
-          <section id="main" style="float:none;"><article id="post-2019-10-22" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
-  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
-    
-    
-      <header class="article-header">
-        
+  if theme.reward.enable
+    include includes/reward.pug
+  include includes/pagination.pug
   
-    <h1 class="thumb" class="article-title" itemprop="name">
-      Ajax与JSON
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-meta">
-      
-	<a href="/2019/10/22/2019-10-22/" class="article-date">
-	  <time datetime="2019-10-22T07:20:51.000Z" itemprop="datePublished">十月 22, 2019</time>
-	</a>
-
-       
-      
-	<span id="busuanzi_container_page_pv">
-	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-	</span>
-
-    </div>
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML"><a href="#概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML" class="headerlink" title="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML"></a>概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML</h2><ul>
-<li>异步和同步：客户端和服务器端相互通信的基础上<ul>
-<li>客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。</li>
-<li>客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。   </li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 通过在后台与服务器进行少量数据交换，Ajax 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。传统的网页（不使用 Ajax）如果需要更新内容，必须重载整个网页页面。提升用户的体验    </li>
-</ul>
-<p>​    </p>
-<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><ul>
-<li><p>原生的JS实现方式   </p>
-<pre class=" language-javascript"><code class="language-javascript"> <span class="token number">1</span><span class="token punctuation">.</span>创建核心对象
-  ​                    <span class="token keyword">var</span> xmlhttp<span class="token punctuation">;</span>
-  ​                    <span class="token keyword">if</span> <span class="token punctuation">(</span>window<span class="token punctuation">.</span>XMLHttpRequest<span class="token punctuation">)</span>
-  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE7+, Firefox, Chrome, Opera, Safari</span>
-  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ​                    <span class="token punctuation">}</span>
-  ​                    <span class="token keyword">else</span>
-  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE6, IE5</span>
-  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">ActiveXObject</span><span class="token punctuation">(</span><span class="token string">"Microsoft.XMLHTTP"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ​                    <span class="token punctuation">}</span>  
-  ​    
-  ​                <span class="token number">2</span><span class="token punctuation">.</span> 建立连接
-  ​                <span class="token comment" spellcheck="true">/*
-  ​                    参数：
-  ​                        1. 请求方式：GET、POST
-  ​                            * get方式，请求参数在URL后边拼接。send方法为空参
-  ​                            * post方式，请求参数在send方法中定义
-  ​                        2. 请求的URL：
-  ​                        3. 同步或异步请求：true（异步）或 false（同步）
-  ​                
-               */</span>
-              xmlhttp<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">,</span><span class="token string">"ajaxServlet?username=tom"</span><span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ​                
-              <span class="token comment" spellcheck="true">//3.发送请求</span>
-              xmlhttp<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-              <span class="token comment" spellcheck="true">//4.接受并处理来自服务器的响应结果</span>
-              <span class="token comment" spellcheck="true">//获取方式 ：xmlhttp.responseText</span>
-              <span class="token comment" spellcheck="true">//什么时候获取？当服务器响应成功后再获取</span>
-
-              <span class="token comment" spellcheck="true">//当xmlhttp对象的就绪状态改变时，触发事件onreadystatechange。</span>
-              xmlhttp<span class="token punctuation">.</span>onreadystatechange<span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-              <span class="token punctuation">{</span>
-                  <span class="token comment" spellcheck="true">//判断readyState就绪状态是否为4，判断status响应状态码是否为200</span>
-                  <span class="token keyword">if</span> <span class="token punctuation">(</span>xmlhttp<span class="token punctuation">.</span>readyState<span class="token operator">==</span><span class="token number">4</span> <span class="token operator">&amp;&amp;</span> xmlhttp<span class="token punctuation">.</span>status<span class="token operator">==</span><span class="token number">200</span><span class="token punctuation">)</span>
-                  <span class="token punctuation">{</span>
-                     <span class="token comment" spellcheck="true">//获取服务器的响应结果</span>
-                      <span class="token keyword">var</span> responseText <span class="token operator">=</span> xmlhttp<span class="token punctuation">.</span>responseText<span class="token punctuation">;</span>
-                      <span class="token function">alert</span><span class="token punctuation">(</span>responseText<span class="token punctuation">)</span><span class="token punctuation">;</span>
-                  <span class="token punctuation">}</span>
-              <span class="token punctuation">}</span></code></pre>
-<h2 id="JSON："><a href="#JSON：" class="headerlink" title="JSON："></a>JSON：</h2></li>
-</ul>
-<h3 id="概念：-JavaScript-Object-Notation-JavaScript对象表示法"><a href="#概念：-JavaScript-Object-Notation-JavaScript对象表示法" class="headerlink" title="概念： JavaScript Object Notation        JavaScript对象表示法"></a>概念： JavaScript Object Notation        JavaScript对象表示法</h3><ul>
-<li><p>json现在多用于存储和交换文本信息的语法 进行数据的传输 JSON 比 XML 更小、更快，更易解析。  </p>
-<pre class=" language-javascript"><code class="language-javascript">Person p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-p<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"张三"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-p<span class="token punctuation">.</span><span class="token function">setAge</span><span class="token punctuation">(</span><span class="token number">23</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-p<span class="token punctuation">.</span><span class="token function">setGender</span><span class="token punctuation">(</span><span class="token string">"男"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">var</span> p <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"张三"</span><span class="token punctuation">,</span><span class="token string">"age"</span><span class="token punctuation">:</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">"gender"</span><span class="token punctuation">:</span><span class="token string">"男"</span><span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
-<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3></li>
-</ul>
-<h4 id="基本规则"><a href="#基本规则" class="headerlink" title="基本规则"></a>基本规则</h4><ul>
-<li><p>数据在名称/值对中：json数据是由键值对构成的</p>
-</li>
-<li><p>键用引号(单双都行)引起来，也可以不使用引号   </p>
-<ul>
-<li><p>值得取值类型：  </p>
-<p>1.数字（整数或浮点数）</p>
-<ol start="2">
-<li><p>字符串（在双引号中）</p>
-</li>
-<li><p>逻辑值（true 或 false）    </p>
-</li>
-<li><p>数组（在方括号中）    {“persons”:[{},{}]}        </p>
-</li>
-<li><p>对象（在花括号中） {“address”:{“province”：”陕西”….}}          </p>
-</li>
-<li><p>null</p>
-<ul>
-<li>数据由逗号分隔：多个键值对由逗号分隔    </li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<pre><code>    - 花括号保存对象：使用{}定义json 格式  </code></pre><ul>
-<li><p>方括号保存数组：[]     </p>
-<ul>
-<li>获取数据:  <ol>
-<li>json对象.键名  </li>
-<li>json对象[“键名”]   </li>
-<li>数组对象[索引]  </li>
-<li>遍历 <pre class=" language-javascript"><code class="language-javascript"></code></pre>
-</li>
-</ol>
-</li>
-</ul>
-<pre class=" language-javascript"><code class="language-javascript">     <span class="token comment" spellcheck="true">//1.定义基本格式</span>
-               <span class="token keyword">var</span> person <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> age<span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">'gender'</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-               <span class="token keyword">var</span> ps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
-                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"李四"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">24</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
-                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"王五"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-
-                  <span class="token comment" spellcheck="true">//获取person对象中所有的键和值</span>
-                      <span class="token comment" spellcheck="true">//for in 循环</span>
-​                               <span class="token comment" spellcheck="true">/* for(var key in person){
-​                                    //这样的方式获取不行。因为相当于  person."name"
-​                                    //alert(key + ":" + person.key);
-​                                    alert(key+":"+person[key]);
-​                                }*/</span>
-​                        
-​                               <span class="token comment" spellcheck="true">//获取ps中的所有值</span>
-​                                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ps<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-​                                    <span class="token keyword">var</span> p <span class="token operator">=</span> ps<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-​                                    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> key <span class="token keyword">in</span> p<span class="token punctuation">)</span><span class="token punctuation">{</span>
-​                                        <span class="token function">alert</span><span class="token punctuation">(</span>key<span class="token operator">+</span><span class="token string">":"</span><span class="token operator">+</span>p<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-​                                    <span class="token punctuation">}</span>
-​                                <span class="token punctuation">}</span>
-<span class="token operator">~</span><span class="token operator">~</span><span class="token operator">~</span>
-
-</code></pre>
-</li>
-</ul>
-<ul>
-<li><p>JSON数据和Java对象的相互转换</p>
-<ul>
-<li><p>JSON解析器：</p>
-<pre><code>- 常见的解析器：Jsonlib，Gson，fastjson，jackson</code></pre></li>
-<li><p>JSON转为Java对象</p>
-<ol>
-<li>导入jackson的相关jar包</li>
-<li>创建Jackson核心对象 ObjectMapper</li>
-<li>调用ObjectMapper的相关方法进行转换<ol>
-<li>readValue(json字符串数据,Class)  </li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-<ul>
-<li><p>Java对象转换JSON</p>
-<ol>
-<li><p>使用步骤：</p>
-<ol>
-<li><p>导入jackson的相关jar包</p>
-</li>
-<li><p>创建Jackson核心对象 ObjectMapper</p>
-</li>
-<li><p>调用ObjectMapper的相关方法进行转换</p>
-<ol>
-<li><p>转换方法：</p>
-<ul>
-<li>writeValue(参数1，obj):<br>  参数1：<br>File：将obj对象转换为JSON字符串，并保存到指定的文件中<br>Writer：将obj对象转换为JSON字符串，并将json数据填充到字符输出流中<pre><code>  OutputStream：将obj对象转换为JSON字符串，并将json数据填充到字节输出流中</code></pre><ul>
-<li>writeValueAsString(obj):将对象转为json字符串</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>注解：</p>
-<ol>
-<li>@JsonIgnore：排除属性。</li>
-<li>@JsonFormat：属性值得格式化</li>
-</ol>
-<ul>
-<li>@JsonFormat(pattern = “yyyy-MM-dd”)</li>
-</ul>
-</li>
-<li><p>复杂java对象转换</p>
-<ol>
-<li>List：数组</li>
-<li>Map：对象格式一致 </li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="校验用户名是否存在"><a href="#校验用户名是否存在" class="headerlink" title="校验用户名是否存在"></a>校验用户名是否存在</h2><ul>
-<li><ol>
-<li>服务器响应的数据，在客户端使用时，要想当做json数据格式使用。有两种解决方案：</li>
-</ol>
-</li>
-</ul>
-<pre class=" language-java"><code class="language-java">
-        <span class="token number">1</span><span class="token punctuation">.</span> $<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>type<span class="token punctuation">)</span><span class="token operator">:</span>将最后一个参数type指定为<span class="token string">"json"</span>
-        <span class="token number">2</span><span class="token punctuation">.</span> 在服务器端设置MIME类型
-            response<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"application/json;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-
-      
-    </div>
-    <footer class="entry-meta entry-footer">
-      
-      
-  <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AJAX/">AJAX</a></li></ul>
-
-      
-        
-	<div id="comment">
-		<!-- 来必力City版安装代码 -->
-		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
-		<script type="text/javascript">
-		   (function(d, s) {
-		       var j, e = d.getElementsByTagName(s)[0];
-
-		       if (typeof LivereTower === 'function') { return; }
-
-		       j = d.createElement(s);
-		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-		       j.async = true;
-
-		       e.parentNode.insertBefore(j, e);
-		   })(document, 'script');
-		</script>
-		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
-		</div>
-		<!-- City版安装代码已完成 -->
-	</div>
-
-
-
-      
-    </footer>
-    <hr class="entry-footer-hr">
-  </div>
-  
-    
-<nav id="article-nav">
-  
-    <a href="/2019/10/22/2019-10-23/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">上一篇</strong>
-      <div class="article-nav-title">
-        
-          Redis初识
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2019/10/17/2019-10-17/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">下一篇</strong>
-      <div class="article-nav-title">2019-10-17</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-<!-- Table of Contents -->
-
-  <aside id="sidebar">
-    <div id="toc" class="toc-article">
-    <strong class="toc-title">文章目录</strong>
-    
-      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML"><span class="nav-number">1.</span> <span class="nav-text">概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方式"><span class="nav-number">2.</span> <span class="nav-text">实现方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON："><span class="nav-number">3.</span> <span class="nav-text">JSON：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念：-JavaScript-Object-Notation-JavaScript对象表示法"><span class="nav-number">3.1.</span> <span class="nav-text">概念： JavaScript Object Notation        JavaScript对象表示法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">3.2.</span> <span class="nav-text">语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本规则"><span class="nav-number">3.2.1.</span> <span class="nav-text">基本规则</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例"><span class="nav-number"></span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#校验用户名是否存在"><span class="nav-number">1.</span> <span class="nav-text">校验用户名是否存在</span></a></li></ol>
-    
-    </div>
-  </aside>
-</section>
-        
-      </div>
-
-    </div>
-    <!-- <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-    <a href="/categories" class="mobile-nav-link">Categories</a>
-  
-    <a href="/tags" class="mobile-nav-link">Tags</a>
-  
-    <a href="/about" class="mobile-nav-link">About</a>
-  
-</nav> -->
-    <footer id="footer" class="site-footer">
-  
-
-  <div class="clearfix container">
-      <div class="site-info">
-	      &copy; 2020 小鱼儿的技术博客 All Rights Reserved.
-        
-            <span id="busuanzi_container_site_uv">
-              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
-              本站总访问量<span id="busuanzi_value_site_pv"></span>次
-            </span>
-          
-      </div>
-      <div class="site-credit">
-        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hipaper" target="_blank">hipaper</a>
-      </div>
-  </div>
-</footer>
-
-
-<!-- min height -->
-
-<script>
-    var wrapdiv = document.getElementById("wrap");
-    var contentdiv = document.getElementById("content");
-
-    wrapdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
-
-
-    <!-- headerblur min height -->
-    
-    
-</script>
-    
-<div style="display: none;">
-  <script src="https://s11.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-</div>
-
-<!-- mathjax config similar to math.stackexchange -->
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/main.js"></script>
-
-
-
-
-
-
-
-  <div style="display: none;">
-    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
-  </div>
-
-
-
-	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
-	</script>
-
-
-
-
-
-
-  </div>
-
-  <a id="rocket" href="#top" class=""></a>
-  <script type="text/javascript" src="/js/totop.js" async=""></script>
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
-</html>
+  if theme.related_post && theme.related_post.enable
+    != related_posts(page,site.posts)
+  if page.comments !== false
+    include includes/comments/index.pug
