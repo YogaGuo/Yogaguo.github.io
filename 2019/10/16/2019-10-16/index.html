@@ -89,19 +89,19 @@
 
 
 
-<meta name="description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.    &amp;lt; !– more –&amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
+<meta name="description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.  &amp;lt; ! – more – &amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
 <meta name="keywords" content="模板方法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="设计模式之模板方法总结">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/10/16/2019-10-16/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.    &amp;lt; !– more –&amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
+<meta property="og:description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.  &amp;lt; ! – more – &amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://yogaguo.github.io/2019/10/16/2019-10-16/1.PNG">
-<meta property="og:updated_time" content="2020-05-31T08:12:35.443Z">
+<meta property="og:updated_time" content="2020-05-31T08:16:56.208Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="设计模式之模板方法总结">
-<meta name="twitter:description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.    &amp;lt; !– more –&amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
+<meta name="twitter:description" content="模板方法定义模板方法模式(template method pattern:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。 模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.  &amp;lt; ! – more – &amp;gt; 模板方法的程序组成架构   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。 模板方法实现某种算法">
 <meta name="twitter:image" content="https://yogaguo.github.io/2019/10/16/2019-10-16/1.PNG">
 
 
@@ -350,8 +350,8 @@
 
       
         <h3 id="模板方法定义"><a href="#模板方法定义" class="headerlink" title="模板方法定义"></a>模板方法定义</h3><p><strong>模板方法模式(template method pattern</strong>:定义一个操作中的某种算法的框架，而将一些步骤延迟到子类中。</p>
-<p>模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义.  </p>
-<p> &lt; !– more –&gt;</p>
+<p>模板方法模式使得子类在不改变一个算法结构的前提下，对这些步骤进行一些特定化的定义. </p>
+<p>&lt; ! – more – &gt;</p>
 <h3 id="模板方法的程序组成架构"><a href="#模板方法的程序组成架构" class="headerlink" title="模板方法的程序组成架构"></a>模板方法的程序组成架构</h3><p>   在模板方法模式中，存在一个父类（也可以是父接口），其中包括两类方法：模板放法和步骤方法。</p>
 <h4 id="模板方法"><a href="#模板方法" class="headerlink" title="模板方法"></a>模板方法</h4><p>实现某种算法的方法步骤。而这些步骤都是调用的步骤方法完成的。注意，子类不要重写，为了防止，定义为 <strong>final</strong></p>
 <h4 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h4><p>完成模板方法的每个阶段性方法。每个步骤方法完成某一特定的  完成总算法的一部分功能</p>
