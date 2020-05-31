@@ -6,23 +6,23 @@
   <title>Ajax与JSON | 小鱼儿的技术博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="keywords" content="AJAXJSON">
+  <meta name="keywords" content="AJAX">
   
   
   
   
-  <meta name="description" content="AJAX：1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML     1. 异步和同步：客户端和服务器端相互通信的基础上         * 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。         * 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。">
-<meta name="keywords" content="AJAX,JSON">
+  <meta name="description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
+<meta name="keywords" content="AJAX">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ajax与JSON">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/10/22/2019-10-22/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="AJAX：1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML     1. 异步和同步：客户端和服务器端相互通信的基础上         * 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。         * 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。">
+<meta property="og:description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-05-31T08:05:27.625Z">
+<meta property="og:updated_time" content="2020-05-31T12:11:26.886Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ajax与JSON">
-<meta name="twitter:description" content="AJAX：1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML     1. 异步和同步：客户端和服务器端相互通信的基础上         * 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。         * 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。">
+<meta name="twitter:description" content="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML 异步和同步：客户端和服务器端相互通信的基础上 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术">
   
     <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
   
@@ -136,168 +136,202 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="AJAX："><a href="#AJAX：" class="headerlink" title="AJAX："></a>AJAX：</h1><pre><code>1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML
-    1. 异步和同步：客户端和服务器端相互通信的基础上
-        * 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。
-        * 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。
+        <h2 id="概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML"><a href="#概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML" class="headerlink" title="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML"></a>概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML</h2><ul>
+<li>异步和同步：客户端和服务器端相互通信的基础上<ul>
+<li>客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。</li>
+<li>客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。   </li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 通过在后台与服务器进行少量数据交换，Ajax 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。传统的网页（不使用 Ajax）如果需要更新内容，必须重载整个网页页面。提升用户的体验    </li>
+</ul>
+<p>​    </p>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><ul>
+<li><p>原生的JS实现方式   </p>
+<pre class=" language-javascript"><code class="language-javascript"> <span class="token number">1</span><span class="token punctuation">.</span>创建核心对象
+  ​                    <span class="token keyword">var</span> xmlhttp<span class="token punctuation">;</span>
+  ​                    <span class="token keyword">if</span> <span class="token punctuation">(</span>window<span class="token punctuation">.</span>XMLHttpRequest<span class="token punctuation">)</span>
+  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE7+, Firefox, Chrome, Opera, Safari</span>
+  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                    <span class="token punctuation">}</span>
+  ​                    <span class="token keyword">else</span>
+  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE6, IE5</span>
+  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">ActiveXObject</span><span class="token punctuation">(</span><span class="token string">"Microsoft.XMLHTTP"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                    <span class="token punctuation">}</span>  
+  ​    
+  ​                <span class="token number">2</span><span class="token punctuation">.</span> 建立连接
+  ​                <span class="token comment" spellcheck="true">/*
+  ​                    参数：
+  ​                        1. 请求方式：GET、POST
+  ​                            * get方式，请求参数在URL后边拼接。send方法为空参
+  ​                            * post方式，请求参数在send方法中定义
+  ​                        2. 请求的URL：
+  ​                        3. 同步或异步请求：true（异步）或 false（同步）
+  ​                
+               */</span>
+              xmlhttp<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">,</span><span class="token string">"ajaxServlet?username=tom"</span><span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                
+              <span class="token comment" spellcheck="true">//3.发送请求</span>
+              xmlhttp<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 [1] 
-        通过在后台与服务器进行少量数据交换，Ajax 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。
-        传统的网页（不使用 Ajax）如果需要更新内容，必须重载整个网页页面。
+              <span class="token comment" spellcheck="true">//4.接受并处理来自服务器的响应结果</span>
+              <span class="token comment" spellcheck="true">//获取方式 ：xmlhttp.responseText</span>
+              <span class="token comment" spellcheck="true">//什么时候获取？当服务器响应成功后再获取</span>
 
-        提升用户的体验
+              <span class="token comment" spellcheck="true">//当xmlhttp对象的就绪状态改变时，触发事件onreadystatechange。</span>
+              xmlhttp<span class="token punctuation">.</span>onreadystatechange<span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+              <span class="token punctuation">{</span>
+                  <span class="token comment" spellcheck="true">//判断readyState就绪状态是否为4，判断status响应状态码是否为200</span>
+                  <span class="token keyword">if</span> <span class="token punctuation">(</span>xmlhttp<span class="token punctuation">.</span>readyState<span class="token operator">==</span><span class="token number">4</span> <span class="token operator">&amp;&amp;</span> xmlhttp<span class="token punctuation">.</span>status<span class="token operator">==</span><span class="token number">200</span><span class="token punctuation">)</span>
+                  <span class="token punctuation">{</span>
+                     <span class="token comment" spellcheck="true">//获取服务器的响应结果</span>
+                      <span class="token keyword">var</span> responseText <span class="token operator">=</span> xmlhttp<span class="token punctuation">.</span>responseText<span class="token punctuation">;</span>
+                      <span class="token function">alert</span><span class="token punctuation">(</span>responseText<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                  <span class="token punctuation">}</span>
+              <span class="token punctuation">}</span></code></pre>
+<h2 id="JSON："><a href="#JSON：" class="headerlink" title="JSON："></a>JSON：</h2></li>
+</ul>
+<h3 id="概念：-JavaScript-Object-Notation-JavaScript对象表示法"><a href="#概念：-JavaScript-Object-Notation-JavaScript对象表示法" class="headerlink" title="概念： JavaScript Object Notation        JavaScript对象表示法"></a>概念： JavaScript Object Notation        JavaScript对象表示法</h3><ul>
+<li><p>json现在多用于存储和交换文本信息的语法 进行数据的传输 JSON 比 XML 更小、更快，更易解析。  </p>
+<pre class=" language-javascript"><code class="language-javascript">Person p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"张三"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setAge</span><span class="token punctuation">(</span><span class="token number">23</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setGender</span><span class="token punctuation">(</span><span class="token string">"男"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> p <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"张三"</span><span class="token punctuation">,</span><span class="token string">"age"</span><span class="token punctuation">:</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">"gender"</span><span class="token punctuation">:</span><span class="token string">"男"</span><span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3></li>
+</ul>
+<h4 id="基本规则"><a href="#基本规则" class="headerlink" title="基本规则"></a>基本规则</h4><ul>
+<li><p>数据在名称/值对中：json数据是由键值对构成的</p>
+</li>
+<li><p>键用引号(单双都行)引起来，也可以不使用引号   </p>
+<ul>
+<li><p>值得取值类型：  </p>
+<p>1.数字（整数或浮点数）</p>
+<ol start="2">
+<li><p>字符串（在双引号中）</p>
+</li>
+<li><p>逻辑值（true 或 false）    </p>
+</li>
+<li><p>数组（在方括号中）    {“persons”:[{},{}]}        </p>
+</li>
+<li><p>对象（在花括号中） {“address”:{“province”：”陕西”….}}          </p>
+</li>
+<li><p>null</p>
+<ul>
+<li>数据由逗号分隔：多个键值对由逗号分隔    </li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>    - 花括号保存对象：使用{}定义json 格式  </code></pre><ul>
+<li><p>方括号保存数组：[]     </p>
+<ul>
+<li>获取数据:  <ol>
+<li>json对象.键名  </li>
+<li>json对象[“键名”]   </li>
+<li>数组对象[索引]  </li>
+<li>遍历 <pre class=" language-javascript"><code class="language-javascript"></code></pre>
+</li>
+</ol>
+</li>
+</ul>
+<pre class=" language-javascript"><code class="language-javascript">     <span class="token comment" spellcheck="true">//1.定义基本格式</span>
+               <span class="token keyword">var</span> person <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> age<span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">'gender'</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-2. 实现方式：
-    1. 原生的JS实现方式（了解）
-                 //1.创建核心对象
-                var xmlhttp;
-                if (window.XMLHttpRequest)
-                {// code for IE7+, Firefox, Chrome, Opera, Safari
-                    xmlhttp=new XMLHttpRequest();
-                }
-                else
-                {// code for IE6, IE5
-                    xmlhttp=new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);
-                }
+               <span class="token keyword">var</span> ps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"李四"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">24</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"王五"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-                //2. 建立连接
-                /*
-                    参数：
-                        1. 请求方式：GET、POST
-                            * get方式，请求参数在URL后边拼接。send方法为空参
-                            * post方式，请求参数在send方法中定义
-                        2. 请求的URL：
-                        3. 同步或异步请求：true（异步）或 false（同步）
+                  <span class="token comment" spellcheck="true">//获取person对象中所有的键和值</span>
+                      <span class="token comment" spellcheck="true">//for in 循环</span>
+​                               <span class="token comment" spellcheck="true">/* for(var key in person){
+​                                    //这样的方式获取不行。因为相当于  person."name"
+​                                    //alert(key + ":" + person.key);
+​                                    alert(key+":"+person[key]);
+​                                }*/</span>
+​                        
+​                               <span class="token comment" spellcheck="true">//获取ps中的所有值</span>
+​                                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ps<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+​                                    <span class="token keyword">var</span> p <span class="token operator">=</span> ps<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+​                                    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> key <span class="token keyword">in</span> p<span class="token punctuation">)</span><span class="token punctuation">{</span>
+​                                        <span class="token function">alert</span><span class="token punctuation">(</span>key<span class="token operator">+</span><span class="token string">":"</span><span class="token operator">+</span>p<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+​                                    <span class="token punctuation">}</span>
+​                                <span class="token punctuation">}</span>
+<span class="token operator">~</span><span class="token operator">~</span><span class="token operator">~</span>
 
-                 */
-                xmlhttp.open(&quot;GET&quot;,&quot;ajaxServlet?username=tom&quot;,true);
-
-                //3.发送请求
-                xmlhttp.send();
-
-                //4.接受并处理来自服务器的响应结果
-                //获取方式 ：xmlhttp.responseText
-                //什么时候获取？当服务器响应成功后再获取
-
-                //当xmlhttp对象的就绪状态改变时，触发事件onreadystatechange。
-                xmlhttp.onreadystatechange=function()
-                {
-                    //判断readyState就绪状态是否为4，判断status响应状态码是否为200
-                    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)
-                    {
-                       //获取服务器的响应结果
-                        var responseText = xmlhttp.responseText;
-                        alert(responseText);
-                    }
-                }
-    2. JQeury实现方式
-        1. $.ajax()
-            * 语法：$.ajax({键值对});
-             //使用$.ajax()发送异步请求
-                $.ajax({
-                    url:&quot;ajaxServlet1111&quot; , // 请求路径
-                    type:&quot;POST&quot; , //请求方式
-                    //data: &quot;username=jack&amp;age=23&quot;,//请求参数
-                    data:{&quot;username&quot;:&quot;jack&quot;,&quot;age&quot;:23},
-                    success:function (data) {
-                        alert(data);
-                    },//响应成功后的回调函数
-                    error:function () {
-                        alert(&quot;出错啦...&quot;)
-                    },//表示如果请求响应出现错误，会执行的回调函数
-
-                    dataType:&quot;text&quot;//设置接受到的响应数据的格式
-                });
-        2. $.get()：发送get请求
-            * 语法：$.get(url, [data], [callback], [type])
-                * 参数：
-                    * url：请求路径
-                    * data：请求参数
-                    * callback：回调函数
-                    * type：响应结果的类型
-
-        3. $.post()：发送post请求
-            * 语法：$.post(url, [data], [callback], [type])
-                * 参数：
-                    * url：请求路径
-                    * data：请求参数
-                    * callback：回调函数
-                    * type：响应结果的类型</code></pre><a id="more"></a><h1 id="JSON："><a href="#JSON：" class="headerlink" title="JSON："></a>JSON：</h1><pre><code>1. 概念： JavaScript Object Notation        JavaScript对象表示法
-    Person p = new Person();
-    p.setName(&quot;张三&quot;);
-    p.setAge(23);
-    p.setGender(&quot;男&quot;);
-
-    var p = {&quot;name&quot;:&quot;张三&quot;,&quot;age&quot;:23,&quot;gender&quot;:&quot;男&quot;};
-
-    * json现在多用于存储和交换文本信息的语法
-    * 进行数据的传输
-    * JSON 比 XML 更小、更快，更易解析。
-
-2. 语法：
-    1. 基本规则
-        * 数据在名称/值对中：json数据是由键值对构成的
-            * 键用引号(单双都行)引起来，也可以不使用引号
-            * 值得取值类型：
-                1. 数字（整数或浮点数）
-                2. 字符串（在双引号中）
-                3. 逻辑值（true 或 false）
-                4. 数组（在方括号中）    {&quot;persons&quot;:[{},{}]}
-                5. 对象（在花括号中） {&quot;address&quot;:{&quot;province&quot;：&quot;陕西&quot;....}}
-                6. null
-        * 数据由逗号分隔：多个键值对由逗号分隔
-        * 花括号保存对象：使用{}定义json 格式
-        * 方括号保存数组：[]
-    2. 获取数据:
-        1. json对象.键名
-        2. json对象[&quot;键名&quot;]
-        3. 数组对象[索引]
-        4. 遍历
-                 //1.定义基本格式
-                var person = {&quot;name&quot;: &quot;张三&quot;, age: 23, &#39;gender&#39;: true};
-
-                var ps = [{&quot;name&quot;: &quot;张三&quot;, &quot;age&quot;: 23, &quot;gender&quot;: true},
-                    {&quot;name&quot;: &quot;李四&quot;, &quot;age&quot;: 24, &quot;gender&quot;: true},
-                    {&quot;name&quot;: &quot;王五&quot;, &quot;age&quot;: 25, &quot;gender&quot;: false}];</code></pre><p>​<br>​<br>​<br>                    //获取person对象中所有的键和值<br>                    //for in 循环<br>                   /* for(var key in person){<br>                        //这样的方式获取不行。因为相当于  person.”name”<br>                        //alert(key + “:” + person.key);<br>                        alert(key+”:”+person[key]);<br>                    }*/</p>
-<pre><code>               //获取ps中的所有值
-                for (var i = 0; i &lt; ps.length; i++) {
-                    var p = ps[i];
-                    for(var key in p){
-                        alert(key+&quot;:&quot;+p[key]);
-                    }
-                }</code></pre><pre class=" language-java"><code class="language-java"><span class="token number">3</span><span class="token punctuation">.</span> JSON数据和Java对象的相互转换
-
-    <span class="token operator">*</span> JSON解析器：
-        <span class="token operator">*</span> 常见的解析器：Jsonlib，Gson，fastjson，jackson
-
-    <span class="token number">1</span><span class="token punctuation">.</span> JSON转为Java对象
-        <span class="token number">1</span><span class="token punctuation">.</span> 导入jackson的相关jar包
-        <span class="token number">2</span><span class="token punctuation">.</span> 创建Jackson核心对象 ObjectMapper
-        <span class="token number">3</span><span class="token punctuation">.</span> 调用ObjectMapper的相关方法进行转换
-            <span class="token number">1</span><span class="token punctuation">.</span> <span class="token function">readValue</span><span class="token punctuation">(</span>json字符串数据<span class="token punctuation">,</span>Class<span class="token punctuation">)</span>
-    <span class="token number">2</span><span class="token punctuation">.</span> Java对象转换JSON
-        <span class="token number">1</span><span class="token punctuation">.</span> 使用步骤：
-            <span class="token number">1</span><span class="token punctuation">.</span> 导入jackson的相关jar包
-            <span class="token number">2</span><span class="token punctuation">.</span> 创建Jackson核心对象 ObjectMapper
-            <span class="token number">3</span><span class="token punctuation">.</span> 调用ObjectMapper的相关方法进行转换
-                <span class="token number">1</span><span class="token punctuation">.</span> 转换方法：
-                    <span class="token operator">*</span> <span class="token function">writeValue</span><span class="token punctuation">(</span>参数<span class="token number">1</span>，obj<span class="token punctuation">)</span><span class="token operator">:</span>
-                        参数<span class="token number">1</span>：
-                            File：将obj对象转换为JSON字符串，并保存到指定的文件中
-                            Writer：将obj对象转换为JSON字符串，并将json数据填充到字符输出流中
-                            OutputStream：将obj对象转换为JSON字符串，并将json数据填充到字节输出流中
-                    <span class="token operator">*</span> <span class="token function">writeValueAsString</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token operator">:</span>将对象转为json字符串
-
-                <span class="token number">2</span><span class="token punctuation">.</span> 注解：
-                    <span class="token number">1</span><span class="token punctuation">.</span> <span class="token annotation punctuation">@JsonIgnore</span>：排除属性。
-                    <span class="token number">2</span><span class="token punctuation">.</span> <span class="token annotation punctuation">@JsonFormat</span>：属性值得格式化
-                        <span class="token operator">*</span> <span class="token annotation punctuation">@JsonFormat</span><span class="token punctuation">(</span>pattern <span class="token operator">=</span> <span class="token string">"yyyy-MM-dd"</span><span class="token punctuation">)</span>
-
-                <span class="token number">3</span><span class="token punctuation">.</span> 复杂java对象转换
-                    <span class="token number">1</span><span class="token punctuation">.</span> List：数组
-                    <span class="token number">2</span><span class="token punctuation">.</span> Map：对象格式一致</code></pre>
-<h1 id="案例："><a href="#案例：" class="headerlink" title="案例："></a>案例：</h1><pre class=" language-java"><code class="language-java"><span class="token operator">*</span> 校验用户名是否存在
-    <span class="token number">1</span><span class="token punctuation">.</span> 服务器响应的数据，在客户端使用时，要想当做json数据格式使用。有两种解决方案：
+</code></pre>
+</li>
+</ul>
+<ul>
+<li><p>JSON数据和Java对象的相互转换</p>
+<ul>
+<li><p>JSON解析器：</p>
+<pre><code>- 常见的解析器：Jsonlib，Gson，fastjson，jackson</code></pre></li>
+<li><p>JSON转为Java对象</p>
+<ol>
+<li>导入jackson的相关jar包</li>
+<li>创建Jackson核心对象 ObjectMapper</li>
+<li>调用ObjectMapper的相关方法进行转换<ol>
+<li>readValue(json字符串数据,Class)  </li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>Java对象转换JSON</p>
+<ol>
+<li><p>使用步骤：</p>
+<ol>
+<li><p>导入jackson的相关jar包</p>
+</li>
+<li><p>创建Jackson核心对象 ObjectMapper</p>
+</li>
+<li><p>调用ObjectMapper的相关方法进行转换</p>
+<ol>
+<li><p>转换方法：</p>
+<ul>
+<li>writeValue(参数1，obj):<br>  参数1：<br>File：将obj对象转换为JSON字符串，并保存到指定的文件中<br>Writer：将obj对象转换为JSON字符串，并将json数据填充到字符输出流中<pre><code>  OutputStream：将obj对象转换为JSON字符串，并将json数据填充到字节输出流中</code></pre><ul>
+<li>writeValueAsString(obj):将对象转为json字符串</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>注解：</p>
+<ol>
+<li>@JsonIgnore：排除属性。</li>
+<li>@JsonFormat：属性值得格式化</li>
+</ol>
+<ul>
+<li>@JsonFormat(pattern = “yyyy-MM-dd”)</li>
+</ul>
+</li>
+<li><p>复杂java对象转换</p>
+<ol>
+<li>List：数组</li>
+<li>Map：对象格式一致 </li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="校验用户名是否存在"><a href="#校验用户名是否存在" class="headerlink" title="校验用户名是否存在"></a>校验用户名是否存在</h2><ul>
+<li><ol>
+<li>服务器响应的数据，在客户端使用时，要想当做json数据格式使用。有两种解决方案：</li>
+</ol>
+</li>
+</ul>
+<pre class=" language-java"><code class="language-java">
         <span class="token number">1</span><span class="token punctuation">.</span> $<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>type<span class="token punctuation">)</span><span class="token operator">:</span>将最后一个参数type指定为<span class="token string">"json"</span>
         <span class="token number">2</span><span class="token punctuation">.</span> 在服务器端设置MIME类型
             response<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"application/json;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
@@ -308,7 +342,7 @@
       
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AJAX/">AJAX</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JSON/">JSON</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AJAX/">AJAX</a></li></ul>
 
       
         
@@ -369,7 +403,7 @@
     <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
     
-      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AJAX："><span class="nav-number">1.</span> <span class="nav-text">AJAX：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON："><span class="nav-number">2.</span> <span class="nav-text">JSON：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例："><span class="nav-number">3.</span> <span class="nav-text">案例：</span></a></li></ol>
+      <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML"><span class="nav-number">1.</span> <span class="nav-text">概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方式"><span class="nav-number">2.</span> <span class="nav-text">实现方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON："><span class="nav-number">3.</span> <span class="nav-text">JSON：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念：-JavaScript-Object-Notation-JavaScript对象表示法"><span class="nav-number">3.1.</span> <span class="nav-text">概念： JavaScript Object Notation        JavaScript对象表示法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">3.2.</span> <span class="nav-text">语法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本规则"><span class="nav-number">3.2.1.</span> <span class="nav-text">基本规则</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#案例"><span class="nav-number"></span> <span class="nav-text">案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#校验用户名是否存在"><span class="nav-number">1.</span> <span class="nav-text">校验用户名是否存在</span></a></li></ol>
     
     </div>
   </aside>

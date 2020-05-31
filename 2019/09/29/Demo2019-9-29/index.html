@@ -11,13 +11,13 @@
   
   
   
-  <meta name="description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图">
+  <meta name="description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
 <meta name="keywords" content="JVM内存模型,GC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM内存模型与GC算法策略">
 <meta property="og:url" content="https://Yogaguo.github.io/2019/09/29/Demo2019-9-29/index.html">
 <meta property="og:site_name" content="小鱼儿的技术博客">
-<meta property="og:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图">
+<meta property="og:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/07.png">
 <meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/08.png">
@@ -29,10 +29,10 @@
 <meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/06.png">
 <meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/09.png">
 <meta property="og:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/10.png">
-<meta property="og:updated_time" content="2019-10-04T11:38:59.846Z">
+<meta property="og:updated_time" content="2020-05-31T12:12:02.823Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM内存模型与GC算法策略">
-<meta name="twitter:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图">
+<meta name="twitter:description" content="JVM Run-Time Data Area 运行时数据区在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图       JVM Stacks   Java虚拟机栈首先要知道，栈是操作系统内核为某个进程或者线程建立的存储区域，它保存着一个线程中的方法的调用状态，它 具有先进后出的特性。在栈中的数据大小与生命周期都是确定的，在方法执行完成后退出栈后，它的">
 <meta name="twitter:image" content="https://yogaguo.github.io/2019/09/29/Demo2019-9-29/07.png">
   
     <link rel="alternate" href="/atom.xml" title="小鱼儿的技术博客" type="application/atom+xml">
@@ -150,7 +150,7 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="JVM-Run-Time-Data-Area-运行时数据区"><a href="#JVM-Run-Time-Data-Area-运行时数据区" class="headerlink" title="JVM Run-Time Data Area 运行时数据区"></a>JVM Run-Time Data Area 运行时数据区</h2><p>在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图</p><a id="more"></a>
+        <h2 id="JVM-Run-Time-Data-Area-运行时数据区"><a href="#JVM-Run-Time-Data-Area-运行时数据区" class="headerlink" title="JVM Run-Time Data Area 运行时数据区"></a>JVM Run-Time Data Area 运行时数据区</h2><p>在学习后文，先展示 JVM RunTime Data Area大致布局图和JVM Stacks图</p>
  <img src="/2019/09/29/Demo2019-9-29/07.png">
 
  <img src="/2019/09/29/Demo2019-9-29/08.png">

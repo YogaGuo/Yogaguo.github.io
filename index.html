@@ -346,33 +346,157 @@ Maven工厂构建spring开发环境 ,导入坐标
 
       
 	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/二叉树/">二叉树</a>
+    <a class="article-category-link" href="/categories/算法/">算法</a>
  
       
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h3 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h3><p>首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).</p>
+<p>首先看普通的递归，其实质是使用了系统提供的函数栈；非递归的方法使用了申请的栈，两者的额外空间复杂度都与树事务高度有关，所以空间复杂度为O(h)。</p>
+<p>本题要求空间复杂度为O(1),这就要求使用 Morris 遍历</p>
+<h3 id="Morris遍历"><a href="#Morris遍历" class="headerlink" title="Morris遍历"></a>Morris遍历</h3><p>Morris遍历的实质就是避免使用栈结构，而是让下层到上层有指针，通过让底层结点指向 null 的空闲指针指向上层某个结点，从而完成下层到上层的移动。因为二叉树的很多结点都有大量空闲指针，比如，某些结点没有右孩子，那么这个结点的 right 指针就指向 null ,Morris遍历正是用了这些空闲指针。</p>
+<p>具体流程：</p>
+<ul>
+<li>当前结点为 cur1,cur1无左子树，cur1向右移动，<code>cur1 = cur1.right</code></li>
+<li>cur1有左子树，找左子树最右结点（mostright）<pre><code>  - mostright的右孩子为 null ,右孩子指向 cur1, cur1 向左移动
+      -  mostright的右孩子为 cur,mostright的右孩子指向 null ,cur向右 cur1 = cur1.right.</code></pre></li>
+</ul>
+<p>总结为：在树中，对于任何一个有左子树的结点，会 2 次回到自己；没有左子树的结点，只会 1 次回到自己，整体顺序为：先回到当前结点，遍历完自己的左子树之后，再回到 cur,在遍历右子树</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morris</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           <span class="token keyword">return</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
+       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
+       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left <span class="token punctuation">;</span>
+           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
+                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+                  cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span> 
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span>
+           cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span></code></pre>
+<h3 id="Morris实现先序遍历"><a href="#Morris实现先序遍历" class="headerlink" title="Morris实现先序遍历"></a>Morris实现先序遍历</h3><p>在Morris的基础上，只要第一次回到当前结点，即 当前结点左子树最右结点的右孩子为 null ;或者当前结点没有左子树</p>
+<p>就直接打印，从而实现先序遍历</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisPre</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           <span class="token keyword">return</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
+       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
+       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left <span class="token punctuation">;</span>
+           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
+                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+                    <span class="token keyword">continue</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+                  cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span> 
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+               System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+           <span class="token punctuation">}</span>
+           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span></code></pre>
+<h3 id="Morris实现中序遍历"><a href="#Morris实现中序遍历" class="headerlink" title="Morris实现中序遍历"></a>Morris实现中序遍历</h3><p>因为中序遍历是：左中右，那么在当前结点没有左子树时，就直接打印；在当前结点有左子树的情况下，第二次回到自己时，打印，实现中序遍历。</p>
+<p>我们知道，不管是没有左子树时，还是第二次回到自己时，下一步都是向右移动，所以，在代码中可以在当前结点 cur1 向右移动时打印结点</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisIn</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">if</span><span class="token punctuation">(</span> head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           <span class="token keyword">return</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
+       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
+       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+           <span class="token keyword">if</span><span class="token punctuation">(</span> cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
+                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+                   <span class="token keyword">continue</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span>
+           System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+   <span class="token punctuation">}</span></code></pre>
+<h3 id="Morris实现后序遍历"><a href="#Morris实现后序遍历" class="headerlink" title="Morris实现后序遍历"></a>Morris实现后序遍历</h3><p>后序遍历有点复杂，在第 2 次回到当前结点时，把左子树右边界逆序打印完后，当整个循环走完，对于整个树，在单独打印树的右遍历。</p>
+<p>对于逆序，可以借助栈，不过会有额外空间额代价，这里采用 链表逆序法 reverse(head),</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">morrisPos</span><span class="token punctuation">(</span>Node head<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+       <span class="token keyword">if</span><span class="token punctuation">(</span>head <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           <span class="token keyword">return</span><span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       Node cur1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
+       Node cur2 <span class="token operator">=</span> null<span class="token punctuation">;</span>
+       <span class="token keyword">while</span><span class="token punctuation">(</span>cur1 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+           cur2 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+           <span class="token keyword">if</span><span class="token punctuation">(</span>cur2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               <span class="token keyword">while</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> cur2<span class="token punctuation">.</span>right <span class="token operator">!=</span> cur1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2 <span class="token operator">=</span> cur2<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+               <span class="token keyword">if</span><span class="token punctuation">(</span>cur2<span class="token punctuation">.</span>right <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> cur1<span class="token punctuation">;</span>
+                   cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>left<span class="token punctuation">;</span>
+                   <span class="token keyword">continue</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span><span class="token keyword">else</span> <span class="token punctuation">{</span>
+                   cur2<span class="token punctuation">.</span>right <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                   <span class="token function">printEdge</span><span class="token punctuation">(</span>cur1<span class="token punctuation">.</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
+           <span class="token punctuation">}</span>
+           cur1 <span class="token operator">=</span> cur1<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+       <span class="token punctuation">}</span>
+       <span class="token function">printEdge</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token punctuation">}</span>
+       <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">printEdge</span><span class="token punctuation">(</span>Node left<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+               Node cur <span class="token operator">=</span> <span class="token function">reverse</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+               <span class="token keyword">while</span><span class="token punctuation">(</span>cur <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">print</span><span class="token punctuation">(</span>cur<span class="token punctuation">.</span>value<span class="token operator">+</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                   cur <span class="token operator">=</span> cur<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+               <span class="token punctuation">}</span>
 
-          
-          <div class="entry-summary">
-          引入首先看一个题：给定一颗二叉树头结点，完成二叉树的先序  后序  中序 ，如果二叉树的结点数为 N ，要求时间复杂度为O(N),额外空间复杂度为O(1).
+        <span class="token punctuation">}</span>
+        <span class="token keyword">private</span> <span class="token keyword">static</span> Node <span class="token function">reverse</span><span class="token punctuation">(</span>Node cur<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Node next <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            Node pre <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            <span class="token keyword">while</span><span class="token punctuation">(</span>cur <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                next <span class="token operator">=</span> cur<span class="token punctuation">.</span>right<span class="token punctuation">;</span>
+                cur<span class="token punctuation">.</span>right <span class="token operator">=</span> pre<span class="token punctuation">;</span>
+                pre <span class="token operator">=</span> cur<span class="token punctuation">;</span>
+                cur <span class="token operator">=</span> next<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> pre<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span></code></pre>
 
-        
-          <p class="article-more-link">
-            <a href="/2019/11/19/2019-11-19/#more">阅读全文</a>
-          </p>
-        </div>
       
     </div>
     <footer class="entry-meta entry-footer">
       
 	<span class="ico-folder"></span>
-    <a class="article-category-link" href="/categories/二叉树/">二叉树</a>
+    <a class="article-category-link" href="/categories/算法/">算法</a>
 
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Morris遍历，二叉树/">Morris遍历，二叉树</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/二叉树/">二叉树</a></li></ul>
 
       
     </footer>
@@ -412,17 +536,138 @@ Maven工厂构建spring开发环境 ,导入坐标
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h2 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h2><p>首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。</p>
+<p>在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。</p>
+<p>在类加载阶段，会将其中一部分的符号引用解析为直接引用，而这种解析成立的前提是：调用目标在程序代码写好  编译期进行编译时必须确定下来。我们打这种方法的调用称为 <strong>解析</strong>。满足这种要求（编译期可知，运行期不可知）的方法包括：静态方法（与类型有关，在初始化阶段就已确定） 私有方法（外部类不可访问），它们的性质就决定了不可能通过继承什么的重写。</p>
+<p>在JVM中，只要能被<strong>invokestatic</strong>和<strong>invokespecial</strong>指令调用的方法，都满足上述（在解析阶段唯一确定），符合条件的方法：静态方法 私有方法  实例构造器  父类方法。它们 在类加载阶段，会将符号引用解析为该方法的直接引用。</p>
+<h2 id="静态分配"><a href="#静态分配" class="headerlink" title="静态分配"></a>静态分配</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
 
-          
-          <div class="entry-summary">
-          解析首先，方法调用不等同于方法执行，方法调用阶段唯一的任务就是确定调用方法的版本，不涉及方法内部的运行过程。在Java的世界中，一切的方法调用在 Class 文件里存储的都只是符号引用， 而不是在实际运行时的内存布局的入口地址（相当于直接引用）。
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StaticDisPatch</span> <span class="token punctuation">{</span>
+     <span class="token keyword">static</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
 
-        
-          <p class="article-more-link">
-            <a href="/2019/11/08/2019-11-8/#more">阅读全文</a>
-          </p>
-        </div>
+    <span class="token punctuation">}</span>
+     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Man</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+    <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Women</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Human guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello guy"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Man guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello man"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span>Women guy<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"hello women"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Human man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Man</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Human women <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        StaticDisPatch sr <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StaticDisPatch</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        sr<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span>man<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        sr<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span>women<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>运行结果：</p>
+<pre class=" language-java"><code class="language-java">hello guy
+hello guy
+</code></pre>
+<p>在上述代码中，把 “Human” 称为 静态类型，后面的 “Man” 称为实际类型，静态类型的变化只在使用时发生，变量本身不发生改变，最终的静态类型是在编译期确定的；而实际类型的变化结果在运行期才可知。编译期在编译程序时并不知道一个对象的实际类型。</p>
+<p>在上述代码中，两次调用 sayHello（）方法，使用哪个重载版本，就完全取决与传入的参数的类型 数量（签名），JVM（或者说编译器）<strong>在重载时是通过参数的静态类型</strong>而不是实际类型作为判定依据的。静态类型在编译期就可以确定。</p>
+<p><strong>总结：在编译期间，Javac编译期会根据参数的静态类型决定使用哪个版本，所有依赖静态类型来定位方法的执行版本的分派动作称为静态分派，典型的就是重载</strong>。</p>
+<h2 id="动态分派—多态与重写"><a href="#动态分派—多态与重写" class="headerlink" title="动态分派—多态与重写"></a>动态分派—多态与重写</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DynamicDisPatch</span> <span class="token punctuation">{</span>
+     <span class="token keyword">static</span> <span class="token keyword">abstract</span> <span class="token keyword">class</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
+         <span class="token keyword">protected</span> <span class="token keyword">abstract</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     <span class="token punctuation">}</span>
+     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Man</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
+         <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+             System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"man say Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token punctuation">}</span>
+     <span class="token punctuation">}</span>
+     <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Women</span> <span class="token keyword">extends</span> <span class="token class-name">Human</span><span class="token punctuation">{</span>
+       <span class="token annotation punctuation">@Override</span>
+              <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                   System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"women say Hello"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+              <span class="token punctuation">}</span>        
+     <span class="token punctuation">}</span>
+     <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Human man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Man</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Human women <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        man<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        women<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        man <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Women</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        man<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>运行结果：</p>
+<pre><code>man say Hello
+women say Hello
+women say Hello
+</code></pre><p>显然，这里不能用静态类型解释，其实造成此结果的愿意：这两个变量的实际类型不同。如果进行反编译，会发现两条 invokespecial 指令，但是两条指令的最终执行目标却不一样，这就要从 invokespecial 指令的运行时的查找过程说起：</p>
+<p>首先：</p>
+<ul>
+<li><p>找到操作数栈顶的第一个元素所指向的对象的实际类型，标记为 A </p>
+</li>
+<li><p>在 类型 A 中找与常量池中的描述符和简单名称相符的方法，找到进行权限访问，通过则返回此方法的直接引用，不通过，抛异常 IIegalAccessError</p>
+</li>
+<li><p>找不到，按继承关系从下往上找。</p>
+</li>
+</ul>
+<p><strong>由于 invokespecial 指令执行的第一步就是在运行期间确定接受者的实际类型</strong>，<strong>所以两次调用中的 invokespecial 指令都是把常量池的类方法符号引用解析到不同的直接引用上</strong>，<strong>这就是 重写的本质</strong>。</p>
+<h2 id="单分配与多分配"><a href="#单分配与多分配" class="headerlink" title="单分配与多分配"></a>单分配与多分配</h2><pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> cn<span class="token punctuation">.</span>bjtxt<span class="token punctuation">.</span>text<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DisPatch</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">QQ</span><span class="token punctuation">{</span>
+
+  <span class="token punctuation">}</span>
+  <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Weixin</span><span class="token punctuation">{</span>
+
+  <span class="token punctuation">}</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Father</span><span class="token punctuation">{</span>
+      <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>QQ qq<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"father choose qq"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>Weixin wechat<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"father choose wechat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Son</span> <span class="token keyword">extends</span> <span class="token class-name">Father</span><span class="token punctuation">{</span>
+      <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>QQ qq<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+         System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"son choose qq"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+      <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">choose</span><span class="token punctuation">(</span>Weixin wechat<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// TODO Auto-generated method stub</span>
+         System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"son choose wechat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Father father <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Father</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Father son <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Son</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    father<span class="token punctuation">.</span><span class="token function">choose</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Weixin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    son<span class="token punctuation">.</span><span class="token function">choose</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">QQ</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>运行结果：</p>
+<pre><code>father choose wechat
+son choose qq
+</code></pre><p>分析：</p>
+<p>​     在编译阶段，由静态分配可知：产生的两条 invokespecial 指令的参数分别为常量池中的 Father.choose(weichat)和Father.choose(qq)方法的符号引用。</p>
+<p>​    在运行时，也就是动态分配时，在执行<code>son.choose(new QQ())</code>,所对应的 invokespecial 指令时，编译期已经确定了目标方法的签名必须为 choose(QQ),JVM此时不关心传递过来的参数的类型，唯一可以影响JVM的因素就是：此方法接受的实际类型是Father还是Son </p>
+<h2 id="方法表"><a href="#方法表" class="headerlink" title="方法表"></a>方法表</h2><p>由于动态分配是非常频繁的动作，基于JVM性能的考虑，常用的“优化手段”——在方法区建立一个<strong>虚方法表</strong>，表中存放着各个方法的实际入口地址。如果某个方法在子类中没有重写，那么子类的虚方法表的地址入口和父类相同方法的入口地址是一致的。都指向父类的实现入口，如果重写了，子类方法表中的地址将会指向子类实现版本的入口。</p>
+<p>为了程序实现上的方便，具有相同签名的方法，在父类，子类的虚方法表中都应当具有一样的索引，这样当类型变化时，只需要变更查找的方法表。</p>
+
       
     </div>
     <footer class="entry-meta entry-footer">
@@ -432,7 +677,7 @@ Maven工厂构建spring开发环境 ,导入坐标
 
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/重写，重载/">重写，重载</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
 
       
     </footer>
@@ -472,22 +717,43 @@ Maven工厂构建spring开发环境 ,导入坐标
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h3 id="一种常见的场景："><a href="#一种常见的场景：" class="headerlink" title="一种常见的场景："></a>一种常见的场景：</h3><p> 工程师经常使用<strong>服务器集群</strong>来设计和实现<strong>数据缓存</strong>，经典的策略是：</p>
+<ul>
+<li><p>无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.</p>
+</li>
+<li><p>如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行</p>
+</li>
+</ul>
+<p>请注意，这种缓存策略可能带来一个问题：</p>
+<ul>
+<li>如果现在是双十一，我要<strong>加机器</strong>来满足负载，或者是有时候要<strong>去掉</strong>几台机器，N变化了，所有的数据都不得不根据 id 重新计算一遍哈希值，并将哈希值对新的机器取模，然后就是大规模的数据迁移。这个代价很高！</li>
+</ul>
+<p>为了解决这个问题，引入<strong>一致性哈希算法</strong>，这是一种很好的数据缓存设计方案。</p>
+<p>假设所有的数据的 id 通过哈希函数转换成的哈希范围是 2^23,范围在 0 ~（2^23）-1 的数字空间中。现在我们可以将这些数字头尾相连。想象成一个闭合的环形，那么一个数据在计算出哈希值之后就会认为对应到环中的一个位置。</p>
+<p>接下来，想象有三台机器通过自己的 ip 计算出来后也在这样的一个环中的各自位置上，那么一条数据如何确定归属那台机器？</p>
+<ul>
+<li><p>首先把数据的 id 用哈希函数计算出哈希值，并映射到环上相应位置。</p>
+</li>
+<li><p>然后<strong>顺时针</strong>寻找离自己位置最近的机器，这台机器就是该数据的归属。</p>
+<img src="/2019/11/03/2019-11-03/1.png">
 
-          
-          <div class="entry-summary">
-          一种常见的场景： 工程师经常使用服务器集群来设计和实现数据缓存，经典的策略是：
-无论是添加，查询还是删除数据，都先将数据的 id 号通过哈希函数转换为一个哈希值，记为 key.
+</li>
+</ul>
+<p>在图 6-4中，data1根据其 id 计算出的哈希值为 key1 ,顺时针的第一台机器是 machine2,所以data1归属；同理，data2归属 machine3,data3和data4归属 machine1.</p>
+<p>增加机器时的处理：假设有两台机器（m1 m2）和三个数据（data1 data2 data3）,数据和机器在环上的结构图 6-5</p>
+<p>如果此时想加入新的机器 m3 ,同时算出机器 m3 的 id 在 m1和 m2 右半边的环上，那么发生 的变化如图 6-6</p>
+<img src="/2019/11/03/2019-11-03/2.png">
 
-如果现在机器有 N 台，则计算 key%N 的值，这个值就是该数据所属的机器编号，无论是添加 删除 还是查询，都只是在这台机器上进行
+<p>在没有添加 m3 之前，从 m1 到现在 m3 位置上的这一段是 m2 掌管的一部分；添加 m3 之后统一归属 m3 ,同时要把这一段的数据从 m2 迁移到 m3 上。由此可见，添加机器时的调整是比较小的。在删除机器时也一样。只要把要删除机器中的机器全部迁移到顺时针找到的机器中。</p>
+<h3 id="机器负载不均的处理"><a href="#机器负载不均的处理" class="headerlink" title="机器负载不均的处理"></a>机器负载不均的处理</h3><p> 根据哈希性质，它的离散型是随着输入域量的增加变好的，实现几乎均匀分布。如果机器较少，有可能造成机器在整个环上的分布不均匀，从而导致机器之间的负载不均衡。比如。图6-7 所示的两台机器，m1可能比m2 面临更大的负载。</p>
+<img src="/2019/11/03/2019-11-03/3.png">
 
+<p>为了解决这种问题，一致性哈希算法引入了<strong>虚拟节点机制</strong>,即对每一台机器通过不同的哈希函数计算出多个哈希值，对多个位置都放置一个服务节点，称为虚拟节点。</p>
+<img src="/2019/11/03/2019-11-03/4.png">
 
+<p>具体做法可以在机器 ip 或 hostname 的后面增加编号或端口号来实现。以图6-7的看，可以为每台机器计算两个节点，分别为m1-1 ,m1-2和m2-1 m2-2的哈希值，于是就形成了四个虚拟节点，这样节点数就变多了，根据哈希函数的性质，平衡性自然会变好。</p>
+<p>当某一条数据计算出归属于m1-2时，再根据表的跳转，数据将最终归属于实际的m1机器。</p>
 
-        
-          <p class="article-more-link">
-            <a href="/2019/11/03/2019-11-03/#more">阅读全文</a>
-          </p>
-        </div>
       
     </div>
     <footer class="entry-meta entry-footer">
@@ -497,7 +763,7 @@ Maven工厂构建spring开发环境 ,导入坐标
 
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/一致性哈希算法/">一致性哈希算法</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/哈希/">哈希</a></li></ul>
 
       
     </footer>
@@ -537,17 +803,60 @@ Maven工厂构建spring开发环境 ,导入坐标
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h2 id="Java内存模型概述"><a href="#Java内存模型概述" class="headerlink" title="Java内存模型概述"></a>Java内存模型概述</h2><p>  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。</p>
+<p>​    <img src="/2019/10/29/2019-10-29/01.jpg"></p>
+<p>在Java内存模型中，JMM抽象出：所有变量都是存在于主存中，类似于普通内存，每个线程又包含自己的本地工作内存区，就类似于CPU的Cache，所以线程的操作都是以自己的本地工作内存为主，它们就只能访问自己的工作内存，线程写完成完成后要把值刷新会主存中。</p>
+<p>在线程执行时，首先从主存中的read值，在load到工作内存中，交给CPU处理，执行完毕，再给工作内存中的变量重写赋值，最后刷新回主存。</p>
+<h2 id="指令重排"><a href="#指令重排" class="headerlink" title="指令重排"></a>指令重排</h2><p>在执行程序时，为了提高性能，编译期和处理器常常会对指令进行重排序。</p>
+<h3 id="数据依懒性"><a href="#数据依懒性" class="headerlink" title="数据依懒性"></a>数据依懒性</h3><p>如果两个操作操作访问同一个变量，且这两个操作中有一个 <strong>写操作</strong>，此时这两个操作就存在数据依懒性。</p>
+<p>只要重排这两个操作的执行顺序，执行结果就会被改变！所以<strong>编译期和处理器不会改变存在数据依懒性的两个操作的执行顺序</strong>。</p>
+<h3 id="as-if-serial-有序性"><a href="#as-if-serial-有序性" class="headerlink" title="as-if-serial(有序性)"></a>as-if-serial(有序性)</h3><p>不管如何重排序，<strong>单线程</strong>的程序执行结果不会被改变。编译期和处理器必须遵守 as-if-serial语义。所以编译期和处理器不会对存在数据依懒性的操作重排序。</p>
+<p>as-if-serial语义把单线程程序 “保护起来”，</p>
+<h3 id="happens-before-有序性"><a href="#happens-before-有序性" class="headerlink" title="happens-before(有序性)"></a>happens-before(有序性)</h3><p><strong>happens-before 要求前一个操作（执行的结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前。并不要求前一个操作必须要在后一个之前执行</strong></p>
+<ul>
+<li><p>程序顺序规则：一个线程中的每个操作，happens-before 于该线程中的任意后续操作</p>
+</li>
+<li><p>监视器锁规则：对一个锁的解锁，happens-before 于随后对这个锁的加锁</p>
+</li>
+<li><p>volatile:对一个volatile域的写，happens-before 于后续任意对这个 volatile 域的读</p>
+</li>
+<li><p>传递性：A happens-before B    B happens-before C ——》A happens-before C</p>
+</li>
+<li><p>start() 规定：线程 A 执行操作 ThreadB.start(启动线程B)，则线程 A 的 ThreadB.start 操作 happens-before 于线程B的任意操作</p>
+<ul>
+<li>比如：线程A在执行ThreadB.start()之前修改了一些共享变量，线程B在开始执行时会读到修改的变量</li>
+</ul>
+</li>
+<li><p>join()规则：线程A执行操作Thread.join()并成功返回，则线程B中任意操作 happens-before于线程A从Thread.join()操作成功返回。</p>
+</li>
+</ul>
+<h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><p>在单线程中，存在 as-if-serial，所以不会不会改变执行结果。但在多线程中，重排序会对执行结果修改。</p>
+<p>当程序未正确同步时，就可能存在<strong>数据竞争</strong>（在一个线程读，在一个线程写，写与读未同步），当存在数据竞争时，运行结果往往不一样。如果一个多线程正确同步。就没有数据竞争。JMM对正确同步的多线程程序内存一致性做了保证：即顺序一致性（程序的执行结果与在顺序一致性内心模型中的执行结果相同）。</p>
+<p><strong>而未同步的程序在JMM中执行时，整体上无序，执行结果也未知</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">T9</span> <span class="token punctuation">{</span>
+     <span class="token keyword">boolean</span> runing<span class="token operator">=</span><span class="token boolean">true</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//加上volatile，线程就会结束。否则一直死循环</span>
+    <span class="token keyword">void</span> <span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m start"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span><span class="token punctuation">(</span>runing<span class="token punctuation">)</span> <span class="token punctuation">{</span>
 
-          
-          <div class="entry-summary">
-          Java内存模型概述  Java虚拟机规范试图定义一种Java内存模型(JMM)，来屏蔽各种硬件和OS的内存访问差异，让Java程在各种平台达到一致的访问效果。其实就是CPU的执行速度与内存访问的速度差异相差巨大，所以在CPU里加了几层高速缓存，有点像计算机组成原理中的Cache。
+        <span class="token punctuation">}</span>
+          System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"m end"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        T9 t<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">T9</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token operator">></span>t<span class="token punctuation">.</span><span class="token function">m</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        t<span class="token punctuation">.</span>runing<span class="token operator">=</span><span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+当线程t1开始运行的时候，会把running值从内存中读到t1线程的工作区，在运行过程过程中直接使用这个copy，并不会每次都去
+ 读取堆内存，这样，当主线程修改running的值后，t1线程感知不到，所以不会停止运行
+</code></pre>
 
-        
-          <p class="article-more-link">
-            <a href="/2019/10/29/2019-10-29/#more">阅读全文</a>
-          </p>
-        </div>
       
     </div>
     <footer class="entry-meta entry-footer">
@@ -557,7 +866,7 @@ Maven工厂构建spring开发环境 ,导入坐标
 
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java内存模型/">Java内存模型</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/happens-before/">happens-before</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java内存模型/">Java内存模型</a></li></ul>
 
       
     </footer>
@@ -716,110 +1025,213 @@ Maven工厂构建spring开发环境 ,导入坐标
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h2 id="概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML"><a href="#概念：-ASynchronous-JavaScript-And-XML-异步的JavaScript-和-XML" class="headerlink" title="概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML"></a>概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML</h2><ul>
+<li>异步和同步：客户端和服务器端相互通信的基础上<ul>
+<li>客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。</li>
+<li>客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。   </li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 通过在后台与服务器进行少量数据交换，Ajax 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。传统的网页（不使用 Ajax）如果需要更新内容，必须重载整个网页页面。提升用户的体验    </li>
+</ul>
+<p>​    </p>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><ul>
+<li><p>原生的JS实现方式   </p>
+<pre class=" language-javascript"><code class="language-javascript"> <span class="token number">1</span><span class="token punctuation">.</span>创建核心对象
+  ​                    <span class="token keyword">var</span> xmlhttp<span class="token punctuation">;</span>
+  ​                    <span class="token keyword">if</span> <span class="token punctuation">(</span>window<span class="token punctuation">.</span>XMLHttpRequest<span class="token punctuation">)</span>
+  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE7+, Firefox, Chrome, Opera, Safari</span>
+  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">XMLHttpRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                    <span class="token punctuation">}</span>
+  ​                    <span class="token keyword">else</span>
+  ​                    <span class="token punctuation">{</span><span class="token comment" spellcheck="true">// code for IE6, IE5</span>
+  ​                        xmlhttp<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">ActiveXObject</span><span class="token punctuation">(</span><span class="token string">"Microsoft.XMLHTTP"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                    <span class="token punctuation">}</span>  
+  ​    
+  ​                <span class="token number">2</span><span class="token punctuation">.</span> 建立连接
+  ​                <span class="token comment" spellcheck="true">/*
+  ​                    参数：
+  ​                        1. 请求方式：GET、POST
+  ​                            * get方式，请求参数在URL后边拼接。send方法为空参
+  ​                            * post方式，请求参数在send方法中定义
+  ​                        2. 请求的URL：
+  ​                        3. 同步或异步请求：true（异步）或 false（同步）
+  ​                
+               */</span>
+              xmlhttp<span class="token punctuation">.</span><span class="token function">open</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">,</span><span class="token string">"ajaxServlet?username=tom"</span><span class="token punctuation">,</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ​                
+              <span class="token comment" spellcheck="true">//3.发送请求</span>
+              xmlhttp<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-          
-          <div class="entry-summary">
-          AJAX：1. 概念： ASynchronous JavaScript And XML    异步的JavaScript 和 XML
-    1. 异步和同步：客户端和服务器端相互通信的基础上
-        * 客户端必须等待服务器端的响应。在等待的期间客户端不能做其他操作。
-        * 客户端不需要等待服务器端的响应。在服务器处理请求的过程中，客户端可以进行其他的操作。
+              <span class="token comment" spellcheck="true">//4.接受并处理来自服务器的响应结果</span>
+              <span class="token comment" spellcheck="true">//获取方式 ：xmlhttp.responseText</span>
+              <span class="token comment" spellcheck="true">//什么时候获取？当服务器响应成功后再获取</span>
 
-        Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 [1] 
-        通过在后台与服务器进行少量数据交换，Ajax 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。
-        传统的网页（不使用 Ajax）如果需要更新内容，必须重载整个网页页面。
+              <span class="token comment" spellcheck="true">//当xmlhttp对象的就绪状态改变时，触发事件onreadystatechange。</span>
+              xmlhttp<span class="token punctuation">.</span>onreadystatechange<span class="token operator">=</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+              <span class="token punctuation">{</span>
+                  <span class="token comment" spellcheck="true">//判断readyState就绪状态是否为4，判断status响应状态码是否为200</span>
+                  <span class="token keyword">if</span> <span class="token punctuation">(</span>xmlhttp<span class="token punctuation">.</span>readyState<span class="token operator">==</span><span class="token number">4</span> <span class="token operator">&amp;&amp;</span> xmlhttp<span class="token punctuation">.</span>status<span class="token operator">==</span><span class="token number">200</span><span class="token punctuation">)</span>
+                  <span class="token punctuation">{</span>
+                     <span class="token comment" spellcheck="true">//获取服务器的响应结果</span>
+                      <span class="token keyword">var</span> responseText <span class="token operator">=</span> xmlhttp<span class="token punctuation">.</span>responseText<span class="token punctuation">;</span>
+                      <span class="token function">alert</span><span class="token punctuation">(</span>responseText<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                  <span class="token punctuation">}</span>
+              <span class="token punctuation">}</span></code></pre>
+<h2 id="JSON："><a href="#JSON：" class="headerlink" title="JSON："></a>JSON：</h2></li>
+</ul>
+<h3 id="概念：-JavaScript-Object-Notation-JavaScript对象表示法"><a href="#概念：-JavaScript-Object-Notation-JavaScript对象表示法" class="headerlink" title="概念： JavaScript Object Notation        JavaScript对象表示法"></a>概念： JavaScript Object Notation        JavaScript对象表示法</h3><ul>
+<li><p>json现在多用于存储和交换文本信息的语法 进行数据的传输 JSON 比 XML 更小、更快，更易解析。  </p>
+<pre class=" language-javascript"><code class="language-javascript">Person p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"张三"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setAge</span><span class="token punctuation">(</span><span class="token number">23</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+p<span class="token punctuation">.</span><span class="token function">setGender</span><span class="token punctuation">(</span><span class="token string">"男"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">var</span> p <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span><span class="token string">"张三"</span><span class="token punctuation">,</span><span class="token string">"age"</span><span class="token punctuation">:</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">"gender"</span><span class="token punctuation">:</span><span class="token string">"男"</span><span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3></li>
+</ul>
+<h4 id="基本规则"><a href="#基本规则" class="headerlink" title="基本规则"></a>基本规则</h4><ul>
+<li><p>数据在名称/值对中：json数据是由键值对构成的</p>
+</li>
+<li><p>键用引号(单双都行)引起来，也可以不使用引号   </p>
+<ul>
+<li><p>值得取值类型：  </p>
+<p>1.数字（整数或浮点数）</p>
+<ol start="2">
+<li><p>字符串（在双引号中）</p>
+</li>
+<li><p>逻辑值（true 或 false）    </p>
+</li>
+<li><p>数组（在方括号中）    {“persons”:[{},{}]}        </p>
+</li>
+<li><p>对象（在花括号中） {“address”:{“province”：”陕西”….}}          </p>
+</li>
+<li><p>null</p>
+<ul>
+<li>数据由逗号分隔：多个键值对由逗号分隔    </li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>    - 花括号保存对象：使用{}定义json 格式  </code></pre><ul>
+<li><p>方括号保存数组：[]     </p>
+<ul>
+<li>获取数据:  <ol>
+<li>json对象.键名  </li>
+<li>json对象[“键名”]   </li>
+<li>数组对象[索引]  </li>
+<li>遍历 <pre class=" language-javascript"><code class="language-javascript"></code></pre>
+</li>
+</ol>
+</li>
+</ul>
+<pre class=" language-javascript"><code class="language-javascript">     <span class="token comment" spellcheck="true">//1.定义基本格式</span>
+               <span class="token keyword">var</span> person <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> age<span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">'gender'</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-        提升用户的体验
+               <span class="token keyword">var</span> ps <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"张三"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">23</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"李四"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">24</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+                   <span class="token punctuation">{</span><span class="token string">"name"</span><span class="token punctuation">:</span> <span class="token string">"王五"</span><span class="token punctuation">,</span> <span class="token string">"age"</span><span class="token punctuation">:</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">"gender"</span><span class="token punctuation">:</span> <span class="token boolean">false</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 
-2. 实现方式：
-    1. 原生的JS实现方式（了解）
-                 //1.创建核心对象
-                var xmlhttp;
-                if (window.XMLHttpRequest)
-                {// code for IE7+, Firefox, Chrome, Opera, Safari
-                    xmlhttp=new XMLHttpRequest();
-                }
-                else
-                {// code for IE6, IE5
-                    xmlhttp=new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);
-                }
+                  <span class="token comment" spellcheck="true">//获取person对象中所有的键和值</span>
+                      <span class="token comment" spellcheck="true">//for in 循环</span>
+​                               <span class="token comment" spellcheck="true">/* for(var key in person){
+​                                    //这样的方式获取不行。因为相当于  person."name"
+​                                    //alert(key + ":" + person.key);
+​                                    alert(key+":"+person[key]);
+​                                }*/</span>
+​                        
+​                               <span class="token comment" spellcheck="true">//获取ps中的所有值</span>
+​                                <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> ps<span class="token punctuation">.</span>length<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+​                                    <span class="token keyword">var</span> p <span class="token operator">=</span> ps<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+​                                    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">var</span> key <span class="token keyword">in</span> p<span class="token punctuation">)</span><span class="token punctuation">{</span>
+​                                        <span class="token function">alert</span><span class="token punctuation">(</span>key<span class="token operator">+</span><span class="token string">":"</span><span class="token operator">+</span>p<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+​                                    <span class="token punctuation">}</span>
+​                                <span class="token punctuation">}</span>
+<span class="token operator">~</span><span class="token operator">~</span><span class="token operator">~</span>
 
-                //2. 建立连接
-                /*
-                    参数：
-                        1. 请求方式：GET、POST
-                            * get方式，请求参数在URL后边拼接。send方法为空参
-                            * post方式，请求参数在send方法中定义
-                        2. 请求的URL：
-                        3. 同步或异步请求：true（异步）或 false（同步）
+</code></pre>
+</li>
+</ul>
+<ul>
+<li><p>JSON数据和Java对象的相互转换</p>
+<ul>
+<li><p>JSON解析器：</p>
+<pre><code>- 常见的解析器：Jsonlib，Gson，fastjson，jackson</code></pre></li>
+<li><p>JSON转为Java对象</p>
+<ol>
+<li>导入jackson的相关jar包</li>
+<li>创建Jackson核心对象 ObjectMapper</li>
+<li>调用ObjectMapper的相关方法进行转换<ol>
+<li>readValue(json字符串数据,Class)  </li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>Java对象转换JSON</p>
+<ol>
+<li><p>使用步骤：</p>
+<ol>
+<li><p>导入jackson的相关jar包</p>
+</li>
+<li><p>创建Jackson核心对象 ObjectMapper</p>
+</li>
+<li><p>调用ObjectMapper的相关方法进行转换</p>
+<ol>
+<li><p>转换方法：</p>
+<ul>
+<li>writeValue(参数1，obj):<br>  参数1：<br>File：将obj对象转换为JSON字符串，并保存到指定的文件中<br>Writer：将obj对象转换为JSON字符串，并将json数据填充到字符输出流中<pre><code>  OutputStream：将obj对象转换为JSON字符串，并将json数据填充到字节输出流中</code></pre><ul>
+<li>writeValueAsString(obj):将对象转为json字符串</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>注解：</p>
+<ol>
+<li>@JsonIgnore：排除属性。</li>
+<li>@JsonFormat：属性值得格式化</li>
+</ol>
+<ul>
+<li>@JsonFormat(pattern = “yyyy-MM-dd”)</li>
+</ul>
+</li>
+<li><p>复杂java对象转换</p>
+<ol>
+<li>List：数组</li>
+<li>Map：对象格式一致 </li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><h2 id="校验用户名是否存在"><a href="#校验用户名是否存在" class="headerlink" title="校验用户名是否存在"></a>校验用户名是否存在</h2><ul>
+<li><ol>
+<li>服务器响应的数据，在客户端使用时，要想当做json数据格式使用。有两种解决方案：</li>
+</ol>
+</li>
+</ul>
+<pre class=" language-java"><code class="language-java">
+        <span class="token number">1</span><span class="token punctuation">.</span> $<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>type<span class="token punctuation">)</span><span class="token operator">:</span>将最后一个参数type指定为<span class="token string">"json"</span>
+        <span class="token number">2</span><span class="token punctuation">.</span> 在服务器端设置MIME类型
+            response<span class="token punctuation">.</span><span class="token function">setContentType</span><span class="token punctuation">(</span><span class="token string">"application/json;charset=utf-8"</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 
-                 */
-                xmlhttp.open(&quot;GET&quot;,&quot;ajaxServlet?username=tom&quot;,true);
-
-                //3.发送请求
-                xmlhttp.send();
-
-                //4.接受并处理来自服务器的响应结果
-                //获取方式 ：xmlhttp.responseText
-                //什么时候获取？当服务器响应成功后再获取
-
-                //当xmlhttp对象的就绪状态改变时，触发事件onreadystatechange。
-                xmlhttp.onreadystatechange=function()
-                {
-                    //判断readyState就绪状态是否为4，判断status响应状态码是否为200
-                    if (xmlhttp.readyState==4 &amp;&amp; xmlhttp.status==200)
-                    {
-                       //获取服务器的响应结果
-                        var responseText = xmlhttp.responseText;
-                        alert(responseText);
-                    }
-                }
-    2. JQeury实现方式
-        1. $.ajax()
-            * 语法：$.ajax({键值对});
-             //使用$.ajax()发送异步请求
-                $.ajax({
-                    url:&quot;ajaxServlet1111&quot; , // 请求路径
-                    type:&quot;POST&quot; , //请求方式
-                    //data: &quot;username=jack&amp;age=23&quot;,//请求参数
-                    data:{&quot;username&quot;:&quot;jack&quot;,&quot;age&quot;:23},
-                    success:function (data) {
-                        alert(data);
-                    },//响应成功后的回调函数
-                    error:function () {
-                        alert(&quot;出错啦...&quot;)
-                    },//表示如果请求响应出现错误，会执行的回调函数
-
-                    dataType:&quot;text&quot;//设置接受到的响应数据的格式
-                });
-        2. $.get()：发送get请求
-            * 语法：$.get(url, [data], [callback], [type])
-                * 参数：
-                    * url：请求路径
-                    * data：请求参数
-                    * callback：回调函数
-                    * type：响应结果的类型
-
-        3. $.post()：发送post请求
-            * 语法：$.post(url, [data], [callback], [type])
-                * 参数：
-                    * url：请求路径
-                    * data：请求参数
-                    * callback：回调函数
-                    * type：响应结果的类型
-
-        
-          <p class="article-more-link">
-            <a href="/2019/10/22/2019-10-22/#more">阅读全文</a>
-          </p>
-        </div>
       
     </div>
     <footer class="entry-meta entry-footer">
       
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AJAX/">AJAX</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JSON/">JSON</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AJAX/">AJAX</a></li></ul>
 
       
     </footer>
@@ -1121,7 +1533,7 @@ Maven工厂构建spring开发环境 ,导入坐标
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JDBC/">JDBC</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java并发编程/">Java并发编程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Redis/">Redis</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/">Servlet</a><span class="category-list-count">5</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/Cookie/">Cookie</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/Tomcat/">Tomcat</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/request/">request</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Session/">Session</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring基础学习/">spring基础学习</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/二叉树/">二叉树</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/采坑/">采坑</a><span class="category-list-count">1</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JVM/">JVM</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java基础/">Java基础</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java并发编程/">Java并发编程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Redis/">Redis</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web/">Web</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring基础学习/">spring基础学习</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/采坑/">采坑</a><span class="category-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1131,7 +1543,7 @@ Maven工厂构建spring开发环境 ,导入坐标
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AJAX/">AJAX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Cookie/">Cookie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GC/">GC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSON/">JSON</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSP/">JSP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM内存模型/">JVM内存模型</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java内存模型/">Java内存模型</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Morris遍历，二叉树/">Morris遍历，二叉树</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Request/">Request</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Response对象/">Response对象</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/happens-before/">happens-before</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希算法/">一致性哈希算法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工厂模式/">工厂模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/模板方法/">模板方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/连接池/">连接池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/重写，重载/">重写，重载</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AJAX/">AJAX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Cookie/">Cookie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GC/">GC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM内存模型/">JVM内存模型</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java内存模型/">Java内存模型</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Tomcat/">Tomcat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/二叉树/">二叉树</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/哈希/">哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/工厂模式/">工厂模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/模板方法/">模板方法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/连接池/">连接池</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1141,7 +1553,7 @@ Maven工厂构建spring开发环境 ,导入坐标
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/AJAX/" style="font-size: 10px;">AJAX</a> <a href="/tags/Cookie/" style="font-size: 10px;">Cookie</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/JSON/" style="font-size: 10px;">JSON</a> <a href="/tags/JSP/" style="font-size: 10px;">JSP</a> <a href="/tags/JVM内存模型/" style="font-size: 10px;">JVM内存模型</a> <a href="/tags/Java内存模型/" style="font-size: 10px;">Java内存模型</a> <a href="/tags/Morris遍历，二叉树/" style="font-size: 10px;">Morris遍历，二叉树</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Request/" style="font-size: 10px;">Request</a> <a href="/tags/Response对象/" style="font-size: 10px;">Response对象</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/happens-before/" style="font-size: 10px;">happens-before</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/servlet/" style="font-size: 10px;">servlet</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/一致性哈希算法/" style="font-size: 10px;">一致性哈希算法</a> <a href="/tags/工厂模式/" style="font-size: 10px;">工厂模式</a> <a href="/tags/模板方法/" style="font-size: 10px;">模板方法</a> <a href="/tags/连接池/" style="font-size: 10px;">连接池</a> <a href="/tags/重写，重载/" style="font-size: 10px;">重写，重载</a>
+      <a href="/tags/AJAX/" style="font-size: 10px;">AJAX</a> <a href="/tags/Cookie/" style="font-size: 10px;">Cookie</a> <a href="/tags/GC/" style="font-size: 10px;">GC</a> <a href="/tags/JVM内存模型/" style="font-size: 10px;">JVM内存模型</a> <a href="/tags/Java/" style="font-size: 10px;">Java</a> <a href="/tags/Java内存模型/" style="font-size: 10px;">Java内存模型</a> <a href="/tags/Redis/" style="font-size: 10px;">Redis</a> <a href="/tags/Servlet/" style="font-size: 20px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/servlet/" style="font-size: 10px;">servlet</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/二叉树/" style="font-size: 10px;">二叉树</a> <a href="/tags/哈希/" style="font-size: 10px;">哈希</a> <a href="/tags/工厂模式/" style="font-size: 10px;">工厂模式</a> <a href="/tags/模板方法/" style="font-size: 10px;">模板方法</a> <a href="/tags/连接池/" style="font-size: 10px;">连接池</a>
     </div>
   </div>
 
